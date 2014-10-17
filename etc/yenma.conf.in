@@ -1,0 +1,45 @@
+# $Id$
+#
+# example of yenma.conf
+
+Service.User: mailnull
+Service.PidFile: @localstatedir@/@progname@.pid
+Service.ControlSocket: inet:20025@127.0.0.1
+
+# Logging
+Logging.Facility: mail
+Logging.Ident: @progname@
+Logging.Mask: info
+
+Milter.Socket: inet:10025@127.0.0.1
+Milter.Backlog: 100
+# Milter.Timeout: 7210
+Milter.DebugLevel: 0
+Milter.LazyQidFetch: false
+
+## Authentication-Results header
+AuthResult.ServId: sa-verifier.example.net
+AuthResult.UseSpfHardfail: false
+
+## SPF verification
+SPF.Verify: true
+SPF.LookupSPFRR: false
+
+## Sender ID verification
+SIDF.Verify: false
+
+## DKIM verification
+Dkim.Verify: true
+# the limit of the number of signature headers per message
+Dkim.SignHeaderLimit: 5
+Dkim.AcceptExpiredSignature: false
+Dkim.Rfc4871Compatible: false
+DkimAdsp.Verify: false
+
+## DMARC
+Dmarc.Verify: true
+Dmarc.PublicSuffixList: @sysconfdir@/effective_tld_names.dat
+Dmarc.RejectAction: reject
+Dmarc.RejectReplyCode: 550
+Dmarc.RejectEnhancedStatusCode: 5.7.1
+Dmarc.RejectMessage: Email rejected per DMARC policy

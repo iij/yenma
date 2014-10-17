@@ -1,0 +1,185 @@
+
+			YENMA インストール手順
+
+* 対応OS
+  - Linux
+  - FreeBSD
+  - Solaris 10 以降
+
+* 必要なソフトウェア
+  - GNU C Compiler
+  - GNU Make
+  - OpenSSL (0.9.8 以降)
+  - リゾルバライブラリ
+    - ldns (1.6.0 以降)
+    または
+    - libbind (bind 9 以降 または libbind 6.0 以降)
+  - libmilter (sendmail 8.13 以降)
+
+* ビルドから起動までの手順
+
+  1. 展開
+
+    $ tar xzf yenma-x.y.z.tar.gz
+    $ cd yenma-x.y.z
+
+  2. 依存するライブラリのインストール
+
+  「依存するライブラリのビルド」を参考に OpenSSL、ldns および
+   libmilter をインストールしてください。
+
+  3. configure の実行
+
+    OpenSSL、ldns および libmilter のヘッダとライブラリが
+    "/usr/local" にインストールされている場合は、引数なしで configure
+    を実行します。
+
+    $ ./configure
+
+    それ以外のディレクトリにインストールされている場合は、--with-ssl、
+    --with-ldns および --with-libmilter オプションで、基底ディレクトリを
+    指定してください
+
+    たとえば、OpenSSL の基底ディレクトリが "/foo"、ldns が "/bar"、
+    libmilter が "/baz" のときは、以下のように実行します。
+
+    $ ./configure --with-ssl=/foo --with-ldns=/bar --with-libmilter=/baz
+
+  4. ビルドの実行
+
+    $ make
+
+  5. インストール
+
+    $ sudo make install
+
+  6. 設定ファイルの編集
+
+    $ sudo vi /etc/yenma.conf
+
+  7. PID ファイル用ディレクトリの作成
+
+    設定項目 "Service.User" で指定したユーザ権限で、
+    "Service.PidFile" に PID ファイルを作成できるよう
+    パーミッションを設定してください。
+
+    例)
+    $ sudo mkdir -p /var/run/yenma
+    $ sudo chown daemon:daemon /var/run/yenma
+    $ sudo chmod 700 /var/run/yenma
+
+  8. 起動
+
+    $ sudo /usr/local/libexec/yenma -c /etc/yenma.conf
+  
+* MTA の設定
+
+  メール受信時に YENMA を利用するように MTA を設定します。
+
+  - sendmail の場合
+    .mc ファイル中で MAIL_FILTER または INPUT_MAIL_FILTER マクロで
+    YENMA のmilter ソケットを指定し、sendmail.cf を生成します。
+
+    例) YENMA デフォルトのソケットを利用する場合：
+
+        INPUT_MAIL_FILTER(`yenma', `S=inet:10025@127.0.0.1')dnl
+
+    INPUT_MAIL_FILTER 設定の詳細については、sendmail パッケージに含まれ
+    ている cf/README 等を参照してください。
+
+    また、MTA として使用する sendmail のバージョンが 8.13 以前の場合、
+    YENMA の設定項目 "Milter.Sendmail813Compatible" を "true" に設定してください。
+
+  - postfix (2.4 以降) の場合
+    YENMA の設定項目 "Milter.LazyQidFetch" を "true" に設定してください。
+    postfix の設定ファイル main.cf の smtpd_milters で YENMA の milter
+    ソケットを指定します。
+
+    例) YENMA デフォルトのソケットを利用する場合：
+
+        smtpd_milters = inet:127.0.0.1:10025
+
+    postfix の milter サポートの詳細については postfix パッケージに含ま
+    れている README_FILES/MILTER_README を参照してください。
+
+* 依存するライブラリのビルド
+
+  ライブラリを /usr/local 以下にインストールする例
+
+  - OpenSSL
+
+    $ tar zxf openssl-x.y.z.tar.gz
+    $ cd openssl-x.y.z
+    $ ./config threads shared --prefix=/usr/local
+    $ make
+    $ sudo make install
+
+  - ldns
+
+    $ tar zxf ldns-x.y.z.tar.gz
+    $ cd ldns-x.y.z
+    $ ./configure --prefix=/usr/local --with-ssl=/usr/local
+    $ make
+    $ sudo make install
+
+  - libbind
+
+    $ tar zxf bind-x.y.z
+    $ cd bind-x.y.z/lib/bind
+    $ ./configure --prefix=/usr/local --enable-threads --with-libtool --enable-ipv6
+    $ make
+    $ sudo make install
+
+  - libmilter
+
+    $ tar zxf sendmail.x.y.z.tar.gz
+    $ cd sendmail-x.y.z
+
+    - devtools/Site/site.config.m4 に以下を記述:
+
+    define(`confINCLUDEDIR', `/usr/local/include')
+    define(`confLIBDIR', `/usr/local/lib')
+    APPENDDEF(`confINCDIRS', `-I/usr/local/bind/include')
+    APPENDDEF(`confLIBS', `/usr/local/lib/libbind.a')
+    # その他の設定は各 OS に応じて追加してください
+
+    $ cd libmilter
+    $ ./Build
+    $ sudo ./Build install
+
+  OpenSSL、ldns および libmilter のビルド手順の詳細については、それ
+  ぞれのパッケージに付属のドキュメント等を参照してください。
+
+* 大規模用途のバイナリを作成する場合の注意点
+
+  - libmilter で SM_CONF_POLL を有効にする
+
+    sendmail との通信に select() を利用すると、FD_SETSIZE 以上の値を持
+    つファイルディスクリプタを扱えません。poll() を使用すべきです。その
+    ため、libmilter をビルドする際には SM_CONF_POLL を定義します。
+
+      # site.config.m4 に追加する設定
+      APPENDDEF(`confENVDEF', `-DSM_CONF_POLL=1')
+
+  - SPARC 版 Solaris 環境では、gcc の "-m64" オプションを利用する
+
+    Solaris の 32bit 版の fopen (libbind内で使用されている) は 255 より
+    大きな値のファイルディスクリプタを扱えません。そこで 64bit 版のバイ
+    ナリを作成する "-m64" オプションを使用し、ライブラリや YENMA を作成
+    します。
+
+    - libbind
+
+      $ ./configure CFLAGS=-m64 LDFLAGS=-m64
+
+    - libmilter
+
+      # site.config.m4 に追加する設定
+      APPENDDEF(`confENVDEF', `-DSM_CONF_POLL=1')
+      APPENDDEF(`confCCOPTS', `-m64')
+
+    - YENMA
+
+      $ ./configure CFLAGS=-m64 LDFLAGS=-m64
+
+$Id$

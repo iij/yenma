@@ -1,0 +1,84 @@
+                            README of ENMA
+                           xxxxxxxx xx, 2014
+
+* ENMA
+
+  ENMA is a milter program for the domain authentication technologies.
+  It authenticates sender's address with SPF, Sender ID, DKIM and DKIM
+  ADSP, then labels the result onto the Authentication-Results: field.
+
+  ENMA implements the following RFCs and an Internet Draft:
+
+  - RFC4406 (Sender ID: Authenticating E-Mail)
+  - RFC4407 (Purported Responsible Address)
+  - RFC4408 (Sender Policy Framework, obsoleted by RFC7208)
+  - RFC4871 (DKIM Signatures, obsoleted by RFC6376)
+  - RFC5451 (Authentication-Results Header Field, obsoleted by RFC7001)
+  - RFC5617 (ADSP)
+  - RFC5672 (RFC 4871 Update, obsoleted by RFC6376)
+  - RFC6376 (DKIM Signatures)
+  - RFC6541 (DKIM ATPS Experiment)
+  - RFC6577 (Auth-Results SPF Erratum, obsoleted by RFC7001)
+  - RFC7001 (Authentication-Results Header Field)
+  - RFC7208 (Sender Policy Framework)
+  - draft-kucherawy-dmarc-base-04 (DMARC)
+
+  ENMA is developed by IIJ. IIJ has been using several domain
+  authentication software, though, all of them appeared unstable. ENMA
+  is designed and implemented in order to stand large ISP's operation
+  and is well-tested.
+
+* Functionality
+
+  - SPF authentication
+
+    Enma extracts a sender domain from SMTP MAIL FROM and looks up
+    DNS. If "<>" is specified in SMTP MAIL FROM, it extracts a domain
+    from SMTP EHLO/HELO. It records authentication result onto the
+    Authentication-Results: field. The Received-SPF: field is not
+    used.
+
+  - Sender ID authentication
+
+    Enma extracts a sender domain from a mail header with RPA and
+    looks up DNS. It records authentication result onto the
+    Authentication-Results: field.
+
+  - DKIM authentication
+
+    Enma extracts a sender domain from the DKIM-Signature field and
+    looks up DNS. Then it checks the DKIM signature to verify
+    authenticity of the sender domain and integrity of the mail body.
+    It records authentication result onto the Authentication-Results:
+
+  - DKIM ADSP check
+
+    If the result of DKIM authentication is "pass" and the sender and
+    the signer is the same (the From: field and the value of the "i"
+    tag), Enma records "pass" without looking up DNS.
+
+    Otherwise, it extracts a sender domain from the From: field and
+    looks up DNS to obtain ADSP information, then records the
+    authentication result onto the Authentication-Results: field.
+
+  - Inserting/deleting the Authentication-Results: field
+
+    Recording results of SPF authentication and Sender ID
+    authentication onto the Authentication-Results: field. Also, to
+    prevent insertion of faked Authentication-Results: fields, the
+    fields which contains the hostname specified with
+    authresult.identifier are deleted.
+
+* Contact info
+
+  You can download ENMA packages at the following website:
+
+    http://enma.sourceforge.net/
+
+  Please use the following mailing lists for questions and discussions
+  on ENMA:
+
+    enma-users@lists.sourceforge.net (English)
+    enma-users-jp@lists.sourceforge.net (Japanese)
+
+$Id$

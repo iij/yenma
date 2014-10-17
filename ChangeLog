@@ -1,0 +1,52 @@
+2012-01-31  Takahiko Suzuki  <takahiko@iij.ad.jp>
+
+    * 1.2.0
+    * [DKIM] fix mis-canonicalization of empty message body in "relax" mode
+
+2011-12-05  Takahiko Suzuki  <takahiko@iij.ad.jp>
+
+    * 1.1.992
+    * support platforms which doesn't have EAI_NODATA any more
+    * adjust configure.ac not to link with librt when ldns is chosen as a resolver
+
+2011-11-28  Takahiko Suzuki  <takahiko@iij.ad.jp>
+
+    * 1.1.991
+    * switch default resolver from libbind to ldns
+    * [SPF/SIDF] fix memory allocation error at expanding "p" macro when <ip> has no validated domain names
+    * [SPF/SIDF] fix misevaluation on domain names longer than 63 characters (thanks to KODAMA Daisuke, NEC BIGLOBE)
+    * [DKIM] catch up the updates from RFC4871, RFC5672 to RFC6376
+    * [DKIM] change result from "none" to "permerror" of message without any Author header
+    * [DKIM] fix mis-canonicalization of header field name includes WSP in "relax" mode
+    * [DKIM] fix memory allocation error on message with syntax errors in sig-i-tag value
+
+2009-04-03  Takahiko Suzuki  <takahiko@iij.ad.jp>
+
+    * 1.1.0
+    * support DKIM (verification only) and DKIM ADSP
+    * support exclusion address list to avoid authentication
+
+2008-08-28  Takahiko Suzuki  <takahiko@iij.ad.jp>
+
+    * 1.0.0
+    * public release
+
+2008-08-26  Takahiko Suzuki  <takahiko@iij.ad.jp>
+
+    * 0.9.2
+    * translate documents into English
+    * fix pid file permission
+    * fix sysconf(_SC_GETPW_R_SIZE_MAX) problem on FreeBSD
+
+2008-08-22  Takahiko Suzuki  <takahiko@iij.ad.jp>
+
+    * 0.9.1
+    * improve build script
+    * add man pages
+
+2008-08-19  Takahiko Suzuki  <takahiko@iij.ad.jp>
+
+    * 0.9.0
+    * internal beta release
+
+$Id$

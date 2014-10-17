@@ -1,0 +1,118 @@
+                            README of YENMA
+                            2014年 xx月xx日
+
+* YENMA
+
+  YENMA は、送信ドメイン認証のための milter プログラムです。送信アドレス
+  を SPF、Sender ID、DKIM および DKIM ADSP の方式で認証し、認証結果を
+  Authentication-Results: フィールドとして挿入します。
+
+  YENMA は、以下の RFC および Internet Draft を実装しています:
+
+  - RFC4406 (Sender ID: Authenticating E-Mail)
+  - RFC4407 (Purported Responsible Address)
+  - RFC4408 (Sender Policy Framework, obsoleted by RFC7208)
+  - RFC4871 (DKIM Signatures, obsoleted by RFC6376)
+  - RFC5451 (Authentication-Results Header Field, obsoleted by RFC7001)
+  - RFC5617 (ADSP)
+  - RFC5672 (RFC 4871 Update, obsoleted by RFC6376)
+  - RFC6376 (DKIM Signatures)
+  - RFC6541 (DKIM ATPS Experiment)
+  - RFC6577 (Auth-Results SPF Erratum, obsoleted by RFC7001)
+  - RFC7001 (Authentication-Results Header Field)
+  - RFC7208 (Sender Policy Framework)
+  - draft-kucherawy-dmarc-base-04 (DMARC)
+
+  YENMA は、IIJ が開発しました。IIJ は、業務として種々の送信ドメイン認証
+  ソフトウェアを利用してきましたが、どれも不安定でした。YENMA は、大手
+  ISP の運用に耐えられるように設計実装され、十分にテストされています。
+
+* 機能
+** 送信ドメイン認証
+
+  - SPF 認証
+
+    SMTP MAIL FROM から送信ドメインを抽出し DNS を引きます。SMTP MAIL
+    FROM に "<>" が指定されている場合は SMTP EHLO/HELO で指定されたドメ
+    インを用います。認証結果は Authentication-Results: フィールドを用い
+    て付与します。Received-SPF: フィールドは使用しません。
+
+  - Sender ID 認証
+
+    PRA を使用してメールのヘッダから送信ドメインを抽出し DNS を引きます。
+    認証結果は Authentication-Results: フィールドを用いて付与します。
+
+  - DKIM 認証
+
+　　DKIM-Signature フィールドから送信ドメインを抽出し DNS を引きます。
+    電子署名を検証して、送信元の正当性とメールの完全性を認します。認証
+    結果は Authentication-Results: フィールドを用いて付与します。
+
+  - DKIM ADSP 検査
+
+    DKIM 認証の結果が pass で、かつ送信者と署名者が同じ(From: フィール
+    ドと i タグの値が一致している)場合は、DNS を引かず、結果を pass に
+    します。
+
+    それ以外は、From: フィールドから送信アドレスを抽出し、DNS から
+    ADSP の情報を得て、検査結果を Authentication-Results: フィールドに
+    付与します。
+
+  - DMARC 検査
+
+    From: フィールドから送信アドレスを抽出し、DNS から DMARC ポリシーを
+    取得し、検査結果を Authentication-Results: フィールドに付与します。
+    DMARC 検査結果に基づくメールの拒絶は、現在実装していません。DMARC
+    検査機能を利用するには Public Suffix リストを設定項目 Dmarc.PublicSuffixList
+    で指定する必要があります。
+
+  - Authentication-Results: フィールドの挿入/削除
+
+    SPF, Sender ID, DKIM, DKIM ADSP, DMARC の認証結果を Authentication-Results:
+    フィールドに記録します。また、外部から偽の Authentication-Results:
+    フィールドを挿入されるのを防ぐため、設定項目 AuthResult.ServId
+    で指定したホスト名を含んだ Authentication-Results: フィールドを削除
+    します。
+
+** 制御コマンド
+  設定項目 "Service.ControlSocket" を指定すると、そのソケットを通じて
+  制御用のコマンドを発行することができます。制御用ソケットを使用す
+  る場合、TCP Wrapper や iptables 等でアクセス元を適切に制限してくだ
+  さい。ビルド時に TCP Wrapper (libwrap) を組み込んでいれば "yenma-control"
+  というサービス名で TCP Wrapper によるアクセス制御を利用することが
+  できます。制御用コマンドのセッションは同時に1つしか確立すること
+  ができません。
+
+  現在使用できるコマンドは以下の通りです:
+
+  - "SHOW-COUNTER", "RESET-COUNTER"
+    認証結果の統計情報を表示します。"SHOW-COUNTER" は表示のみ、
+    "RESET-COUNTER" は表示とカウンタのリセットをアトミックにおこないます。
+
+  - "RELOAD"
+    設定ファイルの再読み込みをおこないます。設定ファイルの項目には
+    再読み込み可能なものと不可能なものがある点に注意してください。
+
+  - "SHUTDOWN", "GRACEFUL"
+    プロセスを終了させます。"SHUTDOWN" は即座に終了させます。"GRACEFUL"
+    は全ての接続が終了するか、設定項目 "Service.GracefulShutdownTimeout"
+    で指定した時間が経過するまで待ってから終了します。どちらのコマンドの
+    発行後も、それ以上制御用コマンドを発行できなくなります。
+
+  - "QUIT"
+    制御用コマンドのセッションを終了する。
+
+設定項目の詳細については、example/yenma-ja.conf を参照してください。
+
+* 連絡先
+
+  YENMA のパッケージは以下のウェブサイトで入手できます:
+
+    http://enma.sourceforge.net/
+
+  YENMA に関する質問や議論には以下のメーリングリストを活用してください:
+
+    enma-users@lists.sourceforge.net (英語)
+    enma-users-jp@lists.sourceforge.net (日本語)
+
+$Id$
