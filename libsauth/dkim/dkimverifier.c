@@ -402,6 +402,7 @@ DkimVerifier_new(const DkimVerificationPolicy *vpolicy, DnsResolver *resolver,
                  DkimVerifier **verifier)
 {
     assert(NULL != vpolicy);
+    assert(NULL != resolver);
 
     DkimVerifier *self = (DkimVerifier *) malloc(sizeof(DkimVerifier));
     if (NULL == self) {

@@ -97,6 +97,10 @@ ResolverPool_acquire(ResolverPool *self)
 void
 ResolverPool_release(ResolverPool *self, DnsResolver *resolver)
 {
+    if (NULL == resolver) {
+        return;
+    }   // end if
+
     int ret = pthread_mutex_lock(&self->pool_lock);
     if (0 != ret) {
         LogError("pthread_mutex_lock failed: errno=%s", strerror(ret));

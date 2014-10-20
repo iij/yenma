@@ -574,7 +574,7 @@ yenma_set_qid(SMFICTX *ctx, YenmaSession *session)
 }   // end function: yenma_set_qid
 
 static bool
-yenma_save_source_info(YenmaSession *session, _SOCK_ADDR *hostaddr)
+yenma_setup_session(YenmaSession *session, _SOCK_ADDR *hostaddr)
 {
     // [SPF] Storing the source IP address
     free(session->hostaddr);
@@ -595,8 +595,18 @@ yenma_save_source_info(YenmaSession *session, _SOCK_ADDR *hostaddr)
         snprintf(session->ipaddr, sizeof(session->ipaddr), "(unavailable)");
     }   // end if
 
+    if (NULL == session->resolver) {
+        session->resolver = ResolverPool_acquire(session->ctx->resolver_pool);
+        if (NULL == session->resolver) {
+            LogError("failed to initialize DNS resolver: resolver=%s, conf=%s",
+                     NNSTR(session->ctx->cfg->resolver_engine),
+                     NNSTR(session->ctx->cfg->resolver_conf));
+            return false;
+        }   // end if
+    }   // end if
+
     return true;
-}   // end function: yenma_save_source_info
+}   // end function: yenma_setup_session
 
 /**
  * clean-up when the SMTP transaction has been cancelled
@@ -697,7 +707,7 @@ yenmamfi_connect_action(YenmaSession *session, _SOCK_ADDR *hostaddr)
         return SMFIS_ACCEPT;
     }   // end if
 
-    return yenma_save_source_info(session, hostaddr) ? SMFIS_CONTINUE : SMFIS_TEMPFAIL;
+    return yenma_setup_session(session, hostaddr) ? SMFIS_CONTINUE : SMFIS_TEMPFAIL;
 }   // end function: yenmamfi_connect_action
 
 /**
@@ -747,7 +757,7 @@ yenmamfi_connect(SMFICTX *ctx, char *hostname, _SOCK_ADDR *hostaddr)
         goto cleanup;
     }   // end if
 
-    if (!yenma_save_source_info(session, hostaddr)) {
+    if (!yenma_setup_session(session, hostaddr)) {
         YenmaSession_free(session);
         goto cleanup;
     }   // end if
@@ -784,16 +794,6 @@ yenmamfi_helo(SMFICTX *ctx, char *helohost)
     // HELO を1コネクション中に複数回受け付けてしまうのでその対策
     if (NULL != helohost && NULL == session->helohost) {
         session->helohost = strdup(helohost);
-    }   // end if
-
-    if (NULL == session->resolver) {
-        session->resolver = ResolverPool_acquire(session->ctx->resolver_pool);
-        if (NULL == session->resolver) {
-            LogError("failed to initialize DNS resolver: resolver=%s, conf=%s",
-                     NNSTR(session->ctx->cfg->resolver_engine),
-                     NNSTR(session->ctx->cfg->resolver_conf));
-            return SMFIS_TEMPFAIL;
-        }   // end if
     }   // end if
 
     return SMFIS_CONTINUE;
