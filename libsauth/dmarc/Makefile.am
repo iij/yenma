@@ -1,7 +1,7 @@
 # $Id$
 
 include $(top_srcdir)/Makefile.decl
-CPPFLAGS += -I$(top_srcdir)/libsauth/include -I$(top_srcdir)/libsauth/base -I$(top_srcdir)/libsauth/dkim
+CPPFLAGS += -I../include -I../base -I../dkim
 
 noinst_LTLIBRARIES = libsauth_dmarc.la
 

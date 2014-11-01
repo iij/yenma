@@ -88,7 +88,7 @@ CFLAGS = @CFLAGS@ -std=gnu99 -Wall -Wextra
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@ $(PTHREAD_CFLAGS) -D_POSIX_PTHREAD_SEMANTICS \
 	-I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common \
-	-I$(top_srcdir)/libsauth/include -I$(top_srcdir)/libsauth/base
+	-I../include -I../base
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@

@@ -1,7 +1,7 @@
 # $Id$
 
 include $(top_srcdir)/Makefile.decl
-CPPFLAGS += -I$(top_srcdir)/libsauth/include -I$(top_srcdir)/libsauth/base
+CPPFLAGS += ../include -I../base
 
 noinst_LTLIBRARIES = libsauth_dkim.la
 
@@ -12,7 +12,7 @@ libsauth_dkim_la_SOURCES = dkimadsp.c dkimatps.c dkimcanonicalizer.c dkimconvert
 	dkimlogger.h dkimpublickey.h dkimsignature.h dkimsignpolicy.h dkimspec.h \
 	dkimtaglistobject.h dkimverificationpolicy.h dkimwildcard.h
 
-dstat.map: $(top_srcdir)/libsauth/include/dkim.h
+dstat.map: ../include/dkim.h
 	rm -f $@
 	grep DSTAT_ $< | grep -v define | $(SED) -e 's/\(DSTAT_[A-Z0-9_]*\).*/CODE2STRMAP(\1),/' > $@
 
