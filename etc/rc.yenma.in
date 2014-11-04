@@ -95,13 +95,13 @@ reload)
     echo "  yenma reloading"
     ;;
 
-graceful)
+graceful-shutdown)
     control_command "GRACEFUL"
-    echo "  starting yenma graceful shutdown"
+    echo "  yenma gracefully shutting down"
     ;;
 
 *)
-    echo "Usage: `basename $0` {start|stop|reload|graceful}" >&2
+    echo "Usage: `basename $0` {start|stop|reload|graceful-shutdown}" >&2
     exit 1
     ;;
 esac
