@@ -4,7 +4,7 @@
 # chkconfig: 2345 98 00
 # description: sender-authentication milter
 # processname: yenma
-# config: @sysconfdir@/yenma.conf
+# config: @sysconfdir@/@progname@.conf
 # pidfile: @localstatedir@/@progname@.pid
 
 prefix=@prefix@
