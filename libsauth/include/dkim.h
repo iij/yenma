@@ -165,7 +165,7 @@ typedef struct DkimFrameResult {
 extern DkimVerificationPolicy *DkimVerificationPolicy_new(void);
 extern void DkimVerificationPolicy_free(DkimVerificationPolicy *self);
 extern void DkimVerificationPolicy_setSignHeaderLimit(DkimVerificationPolicy *self,
-                                                      size_t header_limit);
+		                                              unsigned int header_limit);
 extern void DkimVerificationPolicy_setAuthorLimit(DkimVerificationPolicy *self,
                                                   size_t author_limit);
 extern void DkimVerificationPolicy_acceptExpiredSignature(DkimVerificationPolicy *self, bool flag);

@@ -20,7 +20,7 @@ struct DkimVerificationPolicy {
     // They are evaluated from the top,
     // and the rest are ignored if the number reaches the limit.
     // 0 for unlimited
-    size_t sign_header_limit;
+    unsigned int sign_header_limit;
     // maximum number of the Authors to check their policy.
     // 0 for unlimited
     size_t author_limit;

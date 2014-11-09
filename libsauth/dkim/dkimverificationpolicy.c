@@ -66,7 +66,7 @@ DkimVerificationPolicy_free(DkimVerificationPolicy *self)
  *                     0 for unlimited (default).
  */
 void
-DkimVerificationPolicy_setSignHeaderLimit(DkimVerificationPolicy *self, size_t header_limit)
+DkimVerificationPolicy_setSignHeaderLimit(DkimVerificationPolicy *self, unsigned int header_limit)
 {
     assert(NULL != self);
     self->sign_header_limit = header_limit;

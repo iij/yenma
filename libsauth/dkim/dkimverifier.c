@@ -83,7 +83,7 @@ struct DkimVerifier {
 
     /// the number of DKIM-Signature headers included in the InetMailHeaders object referenced by "headers" field
     /// this number may be more than the number of DkimVerificationFrame
-    size_t sigheader_num;
+    unsigned int sigheader_num;
 
     /// reference to InetMailHeaders object
     const InetMailHeaders *headers;
@@ -352,8 +352,7 @@ DkimVerifier_setupFrame(DkimVerifier *self, const char *headerf, const char *hea
     // log the essentials of the signature accepted
     LogInfo
         ("DKIM-Signature[%u]: domain=%s, selector=%s, pubkeyalg=%s, digestalg=%s, hdrcanon=%s, bodycanon=%s",
-         (unsigned int) self->sigheader_num,
-         InetMailbox_getDomain(DkimSignature_getAuid(frame->signature)),
+         self->sigheader_num, InetMailbox_getDomain(DkimSignature_getAuid(frame->signature)),
          DkimSignature_getSelector(frame->signature),
          DkimEnum_lookupKeyTypeByValue(DkimSignature_getKeyType(frame->signature)),
          DkimEnum_lookupHashAlgorithmByValue(DkimSignature_getHashAlgorithm(frame->signature)),
@@ -454,7 +453,7 @@ DkimVerifier_new(const DkimVerificationPolicy *vpolicy, DnsResolver *resolver,
          */
         if (0 < self->vpolicy->sign_header_limit
             && self->vpolicy->sign_header_limit < self->sigheader_num) {
-            LogInfo("too many signature headers: count=%zu, limit=%zu",
+            LogInfo("too many signature headers: count=%u, limit=%u",
                     self->sigheader_num, self->vpolicy->sign_header_limit);
             break;
         }   // end if
@@ -1007,7 +1006,7 @@ DkimVerifier_getFrameResult(const DkimVerifier *self, size_t signo)
     if (signo < framenum) {
         DkimVerificationFrame_buildResult(frame);
         return &frame->result;
-    } else if (signo < self->sigheader_num) {
+    } else if ((unsigned int) signo < self->sigheader_num) {
         /*
          * SPEC: dkim score is "policy" if the number of DKIM-Signature header exceeds
          * its limit specified by DkimVerificationPolicy.
