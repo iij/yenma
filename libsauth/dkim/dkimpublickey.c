@@ -488,7 +488,6 @@ DkimPublicKey_validate(DkimPublicKey *self, const char *record, const DkimSignat
      *     Signature header field, the Verifier MUST immediately return
      *     PERMFAIL (inappropriate key algorithm).
      */
-
     if (!DkimPublicKey_isPubKeyAlgMatched(self, DkimSignature_getKeyType(signature))) {
         DkimLogPermFail
             ("omitting public key record for public key algorithm mismatch: pubkeyalg=%s, pubkey=%s",
@@ -781,13 +780,10 @@ DkimPublicKey_retrieve(const DkimVerificationPolicy *policy, const DkimSignature
  * @error DSTAT_TMPERR_DNS_ERROR_RESPONSE DNS lookup error (received error response)
  * @error DSTAT_SYSERR_DNS_LOOKUP_FAILURE DNS lookup error (failed to lookup itself)
  */
-DkimStatus
-DkimPublicKey_lookup(const DkimVerificationPolicy *policy, const DkimSignature *signature,
-                     DnsResolver *resolver, DkimPublicKey **publickey)
+static DkimStatus
+DkimPublicKey_lookupImpl(const DkimVerificationPolicy *policy, const DkimSignature *signature,
+                         DnsResolver *resolver, DkimPublicKey **publickey)
 {
-    assert(NULL != signature);
-    assert(NULL != resolver);
-
     /*
      * [RFC6376] 3.5.
      * If there are multiple query mechanisms listed, the choice of query
@@ -822,6 +818,44 @@ DkimPublicKey_lookup(const DkimVerificationPolicy *policy, const DkimSignature *
     DkimLogPermFail("no valid public key record is found: domain=%s, selector=%s",
                     DkimSignature_getSdid(signature), DkimSignature_getSelector(signature));
     return DSTAT_PERMFAIL_NO_KEY_FOR_SIGNATURE;
+}   // end function: DkimPublicKey_lookupImpl
+
+/**
+ * @error DSTAT_SYSERR_NORESOURCE memory allocation error
+ * @error DSTAT_SYSERR_IMPLERROR obvious implementation error
+ * @error DSTAT_PERMFAIL_NO_KEY_FOR_SIGNATURE Public key record does not exist
+ * @error DSTAT_PERMFAIL_KEY_TOO_WEAK the key used to sign is weaker than verifier policy
+ * @error DSTAT_TMPERR_DNS_ERROR_RESPONSE DNS lookup error (received error response)
+ * @error DSTAT_SYSERR_DNS_LOOKUP_FAILURE DNS lookup error (failed to lookup itself)
+ */
+DkimStatus
+DkimPublicKey_lookup(const DkimVerificationPolicy *policy, const DkimSignature *signature,
+                     DnsResolver *resolver, DkimPublicKey **publickey)
+{
+    assert(NULL != signature);
+    assert(NULL != resolver);
+    assert(NULL != publickey);
+
+    DkimStatus lookup_dstat = DkimPublicKey_lookupImpl(policy, signature, resolver, publickey);
+    if (DSTAT_OK == lookup_dstat) {
+        // check the key length
+        switch (EVP_PKEY_type((*publickey)->pkey->type)) {
+        case EVP_PKEY_RSA:
+            if ((int) policy->min_rsa_key_length > EVP_PKEY_bits((*publickey)->pkey)) {
+                DkimLogPermFail
+                    ("the key length is not enough for verifier's policy: key=%dbits, policy=%dbits",
+                     (int) EVP_PKEY_bits((*publickey)->pkey), (int) policy->min_rsa_key_length);
+                DkimPublicKey_free(*publickey);
+                publickey = NULL;
+                return DSTAT_PERMFAIL_KEY_TOO_WEAK;
+            }   // end if
+            break;
+        default:
+            // no other public-key cryptography algorithm is defined in DKIM specifications for now.
+            break;
+        }   // end switch
+    }   // end if
+    return lookup_dstat;
 }   // end function: DkimPublicKey_lookup
 
 ////////////////////////////////////////////////////////////////////////

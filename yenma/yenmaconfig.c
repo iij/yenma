@@ -158,6 +158,9 @@ static const ConfigEntry yenma_config_table[] = {
     {"Dkim.Rfc4871Compatible", CONFIG_TYPE_BOOLEAN, "false",
      offsetof(YenmaConfig, dkim_rfc4871_compatible), NULL},
 
+    {"Dkim.MinRSAKeyLength", CONFIG_TYPE_UINT64, "0",
+     offsetof(YenmaConfig, dkim_min_rsa_key_length), NULL},
+
     {"DkimAtps.Verify", CONFIG_TYPE_BOOLEAN, "false",
      offsetof(YenmaConfig, dkim_atps_verify), NULL},
 
@@ -311,6 +314,7 @@ YenmaConfig_buildDkimVerificationPolicy(const YenmaConfig *self, DkimVerificatio
     DkimVerificationPolicy_acceptFutureSignature(vpolicyobj, self->dkim_accept_future_signature);
     DkimVerificationPolicy_verifyAtpsDelegation(vpolicyobj, self->dkim_atps_verify);
     DkimVerificationPolicy_setRfc4871Compatible(vpolicyobj, self->dkim_rfc4871_compatible);
+    DkimVerificationPolicy_setMinRSAKeyLength(vpolicyobj, (unsigned int) self->dkim_min_rsa_key_length);
     *vpolicy = vpolicyobj;
     return DSTAT_OK;
 }   // end function: YenmaConfig_buildDkimVerificationPolicy

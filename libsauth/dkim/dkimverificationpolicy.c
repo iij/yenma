@@ -45,6 +45,7 @@ DkimVerificationPolicy_new(void)
     self->accept_expired_signature = false;
     self->accept_future_signature = false;
     self->enable_atps = true;
+    self->min_rsa_key_length = 0;
 
     return self;
 }   // end function: DkimVerificationPolicy_new
@@ -129,3 +130,10 @@ DkimVerificationPolicy_setRfc4871Compatible(DkimVerificationPolicy *self, bool e
     assert(NULL != self);
     self->rfc4871_compatible = enable;
 }   // end function: DkimVerificationPolicy_setRfc4871Compatible
+
+void
+DkimVerificationPolicy_setMinRSAKeyLength(DkimVerificationPolicy *self, unsigned int keylen)
+{
+    assert(NULL != self);
+    self->min_rsa_key_length = keylen;
+}   // end function: DkimVerificationPolicy_setMinRSAKeyLength

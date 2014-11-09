@@ -19,7 +19,7 @@ struct DkimVerificationPolicy {
     // maximum number of the DKIM signature headers to verify.
     // They are evaluated from the top,
     // and the rest are ignored if the number reaches the limit.
-    // 0 for unlimited
+    // 0 means unlimited.
     unsigned int sign_header_limit;
     // maximum number of the Authors to check their policy.
     // 0 for unlimited
@@ -32,6 +32,9 @@ struct DkimVerificationPolicy {
     bool accept_future_signature;
     // turns ATPS functions on
     bool enable_atps;
+    // acceptable minimum RSA key strength.
+    // 0 means no limitations are applied to RSA key length.
+    unsigned int min_rsa_key_length;
 };
 
 #endif /* __DKIM_VERIFICATION_POLICY_H__ */

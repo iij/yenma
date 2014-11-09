@@ -66,6 +66,7 @@ typedef struct YenmaConfig {
     bool dkim_accept_future_signature;
     uint64_t dkim_signheader_limit;
     bool dkim_rfc4871_compatible;
+    uint64_t dkim_min_rsa_key_length;
     bool dkim_atps_verify;
     bool dkim_adsp_verify;
     char *dkim_canon_dump_dir;

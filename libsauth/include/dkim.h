@@ -125,6 +125,7 @@ typedef enum DkimStatus {
     DSTAT_PERMFAIL_KEY_SYNTAX_VIOLATION,    // tag-value syntax violation in the public key
     DSTAT_PERMFAIL_NO_KEY_FOR_SIGNATURE,    // Public key record does not exist
     DSTAT_PERMFAIL_KEY_REVOKED, // Public key record has revoked
+    DSTAT_PERMFAIL_KEY_TOO_WEAK,        // the signing key is weaker than verifier policy
     DSTAT_PERMFAIL_INCOMPATIBLE_KEY_VERSION,    // unsupported public key version
     DSTAT_PERMFAIL_INAPPROPRIATE_SERVICE_TYPE,  // service type dose not allow the public key record to be applied to email
     DSTAT_PERMFAIL_INAPPROPRIATE_HASH_ALGORITHM,    // digest algorithm of the public key record (key-h-tag) does not match the one of the signature (sig-a-tag-h)
@@ -172,6 +173,7 @@ extern void DkimVerificationPolicy_acceptExpiredSignature(DkimVerificationPolicy
 extern void DkimVerificationPolicy_acceptFutureSignature(DkimVerificationPolicy *self, bool flag);
 extern void DkimVerificationPolicy_verifyAtpsDelegation(DkimVerificationPolicy *self, bool flag);
 extern void DkimVerificationPolicy_setRfc4871Compatible(DkimVerificationPolicy *self, bool enable);
+extern void DkimVerificationPolicy_setMinRSAKeyLength(DkimVerificationPolicy *self, unsigned int keylen);
 
 // DkimVerifier
 extern void DkimVerifier_free(DkimVerifier *self);
