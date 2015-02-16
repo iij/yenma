@@ -1,7 +1,7 @@
 # $Id$
 
 CC = $(PTHREAD_CC)
-CFLAGS += -std=gnu99 -Wall -Wextra
-CPPFLAGS += $(PTHREAD_CFLAGS) -D_POSIX_PTHREAD_SEMANTICS
-CPPFLAGS += -I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common
-LDFLAGS += $(PTHREAD_LIBS)
+AM_CFLAGS = -std=gnu99 -Wall -Wextra $(PTHREAD_CFLAGS)
+AM_CPPFLAGS = -D_POSIX_PTHREAD_SEMANTICS
+AM_CPPFLAGS += -I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common
+AM_LDFLAGS = $(PTHREAD_LIBS)

@@ -1,7 +1,7 @@
 # $Id$
 
 include $(top_srcdir)/Makefile.decl
-CPPFLAGS += -I../include -I../base
+AM_CPPFLAGS += -I../include -I../base
 
 noinst_LTLIBRARIES = libsauth_spf.la
 

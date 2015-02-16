@@ -1,7 +1,7 @@
 # $Id$
 
 include $(top_srcdir)/Makefile.decl
-CPPFLAGS += ../include -I../base
+AM_CPPFLAGS += ../include -I../base
 
 noinst_LTLIBRARIES = libsauth_dkim.la
 

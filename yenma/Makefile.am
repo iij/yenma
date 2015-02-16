@@ -10,4 +10,4 @@ yenma_SOURCES =yenma.c yenmamfi.c yenmasession.c yenmaconfig.c yenmacontext.c ye
 	ipaddrblocktree.h rbtree.h resolverpool.h validatedresult.h
 
 yenma_LDADD = ../common/libyenma_common.a ../libsauth/libsauth.la
-yenma_LDFLAGS = -lmilter -lcrypto
+yenma_LDFLAGS = -lmilter -lcrypto $(PTHREAD_LIBS)

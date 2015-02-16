@@ -147,10 +147,9 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = $(PTHREAD_CC)
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = @CFLAGS@ -std=gnu99 -Wall -Wextra
+CFLAGS = @CFLAGS@
 CPP = @CPP@
-CPPFLAGS = @CPPFLAGS@ $(PTHREAD_CFLAGS) -D_POSIX_PTHREAD_SEMANTICS \
-	-I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common
+CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -173,7 +172,7 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
-LDFLAGS = @LDFLAGS@ $(PTHREAD_LIBS)
+LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -264,13 +263,17 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = base resolver spf dkim dmarc
 noinst_HEADERS = include
+AM_CFLAGS = -std=gnu99 -Wall -Wextra $(PTHREAD_CFLAGS)
+AM_CPPFLAGS = -D_POSIX_PTHREAD_SEMANTICS \
+	-I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common
+AM_LDFLAGS = $(PTHREAD_LIBS)
 LIBSAUTH_VERSIONINFO = 0:0:0
 lib_LTLIBRARIES = libsauth.la
 libsauth_la_SOURCES = 
 libsauth_la_LIBADD = base/libsauth_base.la resolver/libsauth_resolver.la spf/libsauth_spf.la \
 	dkim/libsauth_dkim.la dmarc/libsauth_dmarc.la
 
-libsauth_la_LDFLAGS = -version-info $(LIBSAUTH_VERSIONINFO)
+libsauth_la_LDFLAGS = $(PTHREAD_LIBS) -version-info $(LIBSAUTH_VERSIONINFO)
 all: all-recursive
 
 .SUFFIXES:

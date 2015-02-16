@@ -85,11 +85,9 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = $(PTHREAD_CC)
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = @CFLAGS@ -std=gnu99 -Wall -Wextra
+CFLAGS = @CFLAGS@
 CPP = @CPP@
-CPPFLAGS = @CPPFLAGS@ $(PTHREAD_CFLAGS) -D_POSIX_PTHREAD_SEMANTICS \
-	-I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common \
-	-I$(top_srcdir)/libsauth/include
+CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -112,7 +110,7 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
-LDFLAGS = @LDFLAGS@ $(PTHREAD_LIBS)
+LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -201,6 +199,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+AM_CFLAGS = -std=gnu99 -Wall -Wextra $(PTHREAD_CFLAGS)
+AM_CPPFLAGS = -D_POSIX_PTHREAD_SEMANTICS \
+	-I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common \
+	-I$(top_srcdir)/libsauth/include
+AM_LDFLAGS = $(PTHREAD_LIBS)
 noinst_LTLIBRARIES = libsauth_resolver.la
 libsauth_resolver_la_SOURCES = dnsresolv.c dnsresolv_internal.h 
 EXTRA_libsauth_resolver_la_SOURCES = bindresolver.c ldnsresolver.c \

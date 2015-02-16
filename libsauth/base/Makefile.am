@@ -1,7 +1,7 @@
 # $Id$
 
 include $(top_srcdir)/Makefile.decl
-CPPFLAGS += -I$(top_srcdir)/libsauth/include
+AM_CPPFLAGS += -I$(top_srcdir)/libsauth/include
 
 noinst_LTLIBRARIES = libsauth_base.la
 
