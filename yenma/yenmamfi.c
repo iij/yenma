@@ -577,7 +577,11 @@ static bool
 yenma_setup_session(YenmaSession *session, _SOCK_ADDR *hostaddr)
 {
     // [SPF] Storing the source IP address
-    free(session->hostaddr);
+    if (NULL == hostaddr) {
+        LogError("milter host address is NULL");
+        return false;
+    }   // end if
+    if (session->hostaddr) free(session->hostaddr);
     session->hostaddr = milter_dupaddr(hostaddr);
     if (NULL == session->hostaddr) {
         LogError("milter socket address duplication failed: errno=%s", strerror(errno));
