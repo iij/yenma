@@ -112,14 +112,20 @@ AC_ARG_WITH(libwrap,
     AC_CHECK_LIB(wrap, hosts_access, [], [AC_MSG_ERROR(libwrap not found)])
 )
 
+expanded_sysconfdir=`eval echo "${sysconfdir}"`
+dnl autoconf 2.70 or later will support ${runstatedir}
+expanded_runstatedir=`eval echo "${localstatedir}/run"`
+
+AC_SUBST(expanded_sysconfdir)
+AC_SUBST(expanded_runstatedir)
 AC_SUBST(RESOLVER_OBJ)
 AC_SUBST(LIBTOOL_DEPS)
 AC_SUBST(progname)
 
-AC_CONFIG_FILES(Makefile common/Makefile yenma/Makefile tools/Makefile)
-AC_CONFIG_FILES(libsauth/Makefile libsauth/base/Makefile libsauth/resolver/Makefile)
-AC_CONFIG_FILES(libsauth/spf/Makefile libsauth/dkim/Makefile libsauth/dmarc/Makefile)
-AC_CONFIG_FILES(etc/Makefile etc/yenma.conf)
+AC_CONFIG_FILES([Makefile common/Makefile yenma/Makefile tools/Makefile])
+AC_CONFIG_FILES([libsauth/Makefile libsauth/base/Makefile libsauth/resolver/Makefile])
+AC_CONFIG_FILES([libsauth/spf/Makefile libsauth/dkim/Makefile libsauth/dmarc/Makefile])
+AC_CONFIG_FILES([etc/Makefile etc/yenma.conf])
 AC_CONFIG_FILES([etc/rc.yenma], [chmod +x etc/rc.yenma])
 
 AC_OUTPUT

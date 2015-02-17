@@ -4,17 +4,17 @@
 # chkconfig: 2345 98 00
 # description: sender-authentication milter
 # processname: yenma
-# config: @sysconfdir@/@progname@.conf
-# pidfile: @localstatedir@/@progname@.pid
+# config: @expanded_sysconfdir@/@progname@.conf
+# pidfile: @expanded_runstatedir@/@progname@.pid
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 exec=@libexecdir@/yenma
 prog=@progname@
-config=@sysconfdir@/${prog}.conf
+config=@expanded_sysconfdir@/${prog}.conf
 lockfile=/var/lock/subsys/${prog}
 NETCAT="/usr/bin/nc"
-pid_file=@localstatedir@/${prog}.pid
+pid_file=@expanded_runstatedir@/${prog}.pid
 CONTROL_PORT=`sed -ne "s/^Service.ControlSocket:\s*\(inet6\{0,1\}:\)\{0,1\}\([^@:]*\)\(@.*\)\{0,1\}/\2/p" ${config}`
 
 # soft resource limit of stack size is default size of

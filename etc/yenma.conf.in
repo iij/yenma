@@ -3,7 +3,7 @@
 # example of yenma.conf
 
 Service.User: mailnull
-Service.PidFile: @localstatedir@/@progname@.pid
+Service.PidFile: @expanded_runstatedir@/@progname@.pid
 Service.ControlSocket: inet:20025@127.0.0.1
 
 # Logging
@@ -38,7 +38,7 @@ DkimAdsp.Verify: false
 
 ## DMARC
 Dmarc.Verify: true
-Dmarc.PublicSuffixList: @sysconfdir@/effective_tld_names.dat
+Dmarc.PublicSuffixList: @expanded_sysconfdir@/effective_tld_names.dat
 Dmarc.RejectAction: reject
 Dmarc.RejectReplyCode: 550
 Dmarc.RejectEnhancedStatusCode: 5.7.1
