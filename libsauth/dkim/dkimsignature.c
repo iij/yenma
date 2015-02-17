@@ -818,7 +818,8 @@ DkimSignature_checkFutureTimestamp(const DkimSignature *self)
      * timestamp in the future.
      */
     if (0LL < self->signing_timestamp
-        && (long long) self->verification_time < self->signing_timestamp) {
+        && (long long) self->verification_time < self->signing_timestamp
+        && self->signing_timestamp - (long long) self->verification_time > 600) {
         DkimLogPermFail("this signature had signed in the future: timestamp=%lld, now=%ld",
                         self->signing_timestamp, self->verification_time);
         return DSTAT_PERMFAIL_INCONSISTENT_TIMESTAMP;
