@@ -581,7 +581,7 @@ yenma_setup_session(YenmaSession *session, _SOCK_ADDR *hostaddr)
         LogError("milter host address is NULL");
         return false;
     }   // end if
-    if (session->hostaddr) free(session->hostaddr);
+    free(session->hostaddr);
     session->hostaddr = milter_dupaddr(hostaddr);
     if (NULL == session->hostaddr) {
         LogError("milter socket address duplication failed: errno=%s", strerror(errno));
