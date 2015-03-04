@@ -109,13 +109,13 @@ SockAddr_parseIpAddrBlock(const char *entry, size_t entrylen, struct sockaddr *s
         }   // end if
 
         uint8_t bit_mask[addrlen];
-        memset(&bit_mask, 0, sizeof(bit_mask));
+        memset(bit_mask, 0, sizeof(bit_mask));
         ptrdiff_t offset;
         for (offset = 0; offset < (ptrdiff_t) (mask / 8); ++offset) {
-            *(uint8_t *) ((void *) &bit_mask + offset) = 0xff;
+            *(uint8_t *) ((void *) bit_mask + offset) = 0xff;
         }   // end for
         if (0 < mask % 8) {
-            *(uint8_t *) ((void *) &bit_mask + offset) =
+            *(uint8_t *) ((void *) bit_mask + offset) =
                 (~(uint8_t) 0) << ((uint8_t) 8 - (uint8_t) (mask % 8));
         }   // end if
 
@@ -126,8 +126,8 @@ SockAddr_parseIpAddrBlock(const char *entry, size_t entrylen, struct sockaddr *s
             ? ((void *) &(((struct sockaddr_in *) send)->sin_addr))
             : ((void *) &(((struct sockaddr_in6 *) send)->sin6_addr));
         for (ptrdiff_t offset = 0; offset < (ptrdiff_t) addrlen; offset += sizeof(uint32_t)) {
-            (*(uint32_t *) (start + offset)) &= (*(uint32_t *) ((void *) &bit_mask + offset));
-            (*(uint32_t *) (end + offset)) |= ~(*(uint32_t *) ((void *) &bit_mask + offset));
+            (*(uint32_t *) (start + offset)) &= (*(uint32_t *) ((void *) bit_mask + offset));
+            (*(uint32_t *) (end + offset)) |= ~(*(uint32_t *) ((void *) bit_mask + offset));
         }   // end for
     } else if (NULL != (p = strchr(entrybuf, '-'))) {
         // for "111.222.333.444-555.666.777.888" format
