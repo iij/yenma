@@ -7,11 +7,11 @@
 #
 # $Id$
 
-AC_INIT(yenma, 2.0.0-beta4)
+AC_INIT([yenma],[2.0.0-beta4])
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR(yenma/yenma.c)
 AC_CONFIG_HEADERS(config.h)
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 AM_MAINTAINER_MODE
 
 AC_PROG_CC
@@ -22,8 +22,6 @@ AC_PROG_SED
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
-AC_PROG_LIBTOOL
 LT_INIT
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -58,20 +56,20 @@ AC_CHECK_FUNCS([prctl])
 ACX_PTHREAD([], AC_MSG_ERROR(POSIX thread not found))
 
 AC_ARG_WITH(libmilter,
-    AC_HELP_STRING(--with-libmilter=DIR, [specify libmilter base directory]),
+    AS_HELP_STRING([--with-libmilter=DIR],[specify libmilter base directory]),
     [CPPFLAGS="$CPPFLAGS -I$withval/include" LDFLAGS="$LDFLAGS -L$withval/lib"],
     [CPPFLAGS="$CPPFLAGS -I/usr/local/include" LDFLAGS="$LDFLAGS -L/usr/local/lib"])
 
 AC_ARG_WITH(libbind,
-    AC_HELP_STRING(--with-libbind=DIR, [specify libbind base directory]),
+    AS_HELP_STRING([--with-libbind=DIR],[specify libbind base directory]),
     [CPPFLAGS="$CPPFLAGS -I$withval/include/bind" LDFLAGS="$LDFLAGS -L$withval/lib"])
 
 AC_ARG_WITH(ldns,
-    AC_HELP_STRING(--with-ldns=DIR, [specify ldns base directory]),
+    AS_HELP_STRING([--with-ldns=DIR],[specify ldns base directory]),
     [CPPFLAGS="$CPPFLAGS -I$withval/include" LDFLAGS="$LDFLAGS -L$withval/lib"])
 
 AC_ARG_WITH(ssl,
-    AC_HELP_STRING(--with-ssl=DIR, [specify OpenSSL base directory]),
+    AS_HELP_STRING([--with-ssl=DIR],[specify OpenSSL base directory]),
     [CPPFLAGS="$CPPFLAGS -I$withval/include" LDFLAGS="$LDFLAGS -L$withval/lib"],
     [CPPFLAGS="$CPPFLAGS -I/usr/local/include" LDFLAGS="$LDFLAGS -L/usr/local/lib"])
 
@@ -96,7 +94,7 @@ AC_CHECK_LIB(bind, __res_ndestroy,
      RESOLVER_OBJ="bindresolver.lo ${RESOLVER_OBJ}" MILTER_LIBS="-lbind"])
 
 AC_ARG_WITH(libresolv,
-    AC_HELP_STRING(--with-libresolv, [use libresolv as resolver instead of libbind (NOT RECOMMENDED)]),
+    AS_HELP_STRING([--with-libresolv],[use libresolv as resolver instead of libbind (NOT RECOMMENDED)]),
         [AC_DEFINE(USE_LIBRESOLV, [1], [Define to 1 if you have the `resolv' library (-lresolv).])
          LIBS="-lresolv ${LIBS}"
          RESOLVER_OBJ="bindresolver.lo ${RESOLVER_OBJ}" MILTER_LIBS="-lresolv"])
@@ -108,7 +106,7 @@ fi
 AC_CHECK_LIB(milter, smfi_main, [], [AC_MSG_ERROR(libmilter not found or not available)], [${MILTER_LIBS}])
 
 AC_ARG_WITH(libwrap,
-    AC_HELP_STRING(--with-libwrap, [use tcpwrapper for control socket]),
+    AS_HELP_STRING([--with-libwrap],[use tcpwrapper for control socket]),
     AC_CHECK_LIB(wrap, hosts_access, [], [AC_MSG_ERROR(libwrap not found)])
 )
 
