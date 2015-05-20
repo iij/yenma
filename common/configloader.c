@@ -686,7 +686,7 @@ ConfigLoader_loadDirectory(ConfigStorageBase *config, const char *dirname)
     SKIP_EINTR(closedir(dp));
     free(dirbuf);
 
-    return ret;
+    return bool_cast(0 == ret);
 }   // end function: ConfigLoader_loadDirectory
 
 /**
