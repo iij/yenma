@@ -333,8 +333,8 @@ DkimDigester_updateBody(DkimDigester *self, const unsigned char *buf, size_t len
 /**
  * update digest value of message header
  * @param self DkimDigester object
- * @param headerf header field name
- * @param headerv header field value
+ * @param headerf header field name which does *NOT* include the colon separator (':')
+ * @param headerv header field value of which does *NOT* include the CRLF at the end
  * @param crlf true to append CRLF to the end of header field after canonicalization. false otherwise.
  * @param keep_leading_header_space
  * @return DSTAT_OK for success, otherwise status code that indicates error.

@@ -251,9 +251,20 @@ DkimCanonicalizer_headerWithRelaxed(DkimCanonicalizer *self, const char *headerf
     // from the header field value.
     *(q++) = ':';
 
-    // Discard WSP characters remaining after the colon separating the header field name
-    // from the header field value.
-    for (p = headerv; IS_WSP(*p); ++p);
+    // Discard WSP (including CRLF sequences followed by WSP, which is interpreted as single WSP) characters
+    // remaining after the colon separating the header field name from the header field value.
+    p = headerv;
+    while (true) {
+        if (IS_WSP(*p)) {
+            ++p;
+        } else if ((IS_CR(*p) || IS_LF(*p)) && IS_WSP(*(p + 1))) {
+            p += 2;
+        } else if (IS_CR(*p) && IS_LF(*(p + 1)) && IS_WSP(*(p + 2))) {
+            p += 3;
+        } else {
+            break;
+        }   // end if
+    }   // end while
 
     // write out header field value.
     store_wsp = false;
