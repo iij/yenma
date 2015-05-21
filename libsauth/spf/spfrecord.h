@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2007-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -21,6 +21,10 @@
 #include "spf.h"
 #include "spfenum.h"
 #include "spfevaluator.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum SpfTermCidrOption {
     SPF_TERM_CIDR_OPTION_NONE,
@@ -76,5 +80,9 @@ extern void SpfRecord_free(SpfRecord *self);
 extern SpfStat SpfRecord_getSpfScope(const char *record_head,
                                      const char *record_tail, SpfRecordScope *scope,
                                      const char **scope_tail);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SPF_RECORD_H__ */

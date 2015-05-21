@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -16,6 +16,10 @@
 #include "xbuffer.h"
 #include "socketreader.h"
 #include "socketwriter.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct CommandHandlerMap CommandHandlerMap;
 
@@ -34,5 +38,9 @@ struct CommandHandlerMap {
 };
 
 extern int ProtocolHandler_run(const CommandHandlerMap *handler_table, int fd, void *context);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PROTOCOL_HANDLER_H__ */

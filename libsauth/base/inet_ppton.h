@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2009 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -12,6 +12,14 @@
 #ifndef __INET_PPTON_H__
 #define __INET_PPTON_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int inet_ppton(int af, const char *src, const char *src_tail, void *dst);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __INET_PPTON_H__ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -17,6 +17,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "fieldmask.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // enumeration of the config entry types
 typedef enum {
@@ -61,5 +65,9 @@ extern bool ConfigLoader_load(ConfigStorageBase *config, const char *path);
 extern void ConfigLoader_applyDefaultValue(ConfigStorageBase *config);
 extern void ConfigLoader_cleanup(ConfigStorageBase *config);
 extern void ConfigLoader_dump(const ConfigStorageBase *config);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __CONFIG_LOADER_H__

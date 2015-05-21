@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -24,6 +24,10 @@
 #include "yenmaconfig.h"
 #include "yenmactrl.h"
 #include "authstats.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct YenmaContext {
     RefCountObj_MEMBER;
@@ -51,5 +55,9 @@ extern YenmaContext *YenmaContext_new(void);
 #define YenmaContext_ref(_ctx) ((YenmaContext *) RefCountObj_ref((RefCountObj *) (_ctx)))
 #define YenmaContext_unref(_ctx) RefCountObj_unref((RefCountObj *) (_ctx))
 extern bool YenmaContext_buildPolicies(YenmaContext *self, YenmaConfig *yenmacfg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __YENMA_CONTEXT_H__ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -14,6 +14,10 @@
 
 #include <sys/types.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct DkimVerificationPolicy {
     // maximum number of the DKIM signature headers to verify.
@@ -36,5 +40,9 @@ struct DkimVerificationPolicy {
     // 0 means no limitations are applied to RSA key length.
     unsigned int min_rsa_key_length;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DKIM_VERIFICATION_POLICY_H__ */

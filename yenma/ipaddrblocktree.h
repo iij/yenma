@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2014,2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -15,6 +15,10 @@
 #include <sys/socket.h>
 #include <stdbool.h>
 #include <netinet/in.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct IpAddrBlockTree IpAddrBlockTree;
 
@@ -35,5 +39,9 @@ extern bool IpAddrBlockTree_delete6(IpAddrBlockTree *self, const struct in6_addr
                                     const struct in6_addr *end6);
 extern bool IpAddrBlockTree_deleteBySockAddr(IpAddrBlockTree *self, const struct sockaddr *sstart,
                                              const struct sockaddr *send);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __IPADDR_BLOCK_TREE_H__ */

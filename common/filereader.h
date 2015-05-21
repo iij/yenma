@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2009 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -14,6 +14,10 @@
 
 #include <sys/types.h>
 #include "xbuffer.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum _rfile_stat {
     RFILESTAT_OK = 0,
@@ -34,5 +38,9 @@ extern rfilestat_t FileReader_readString(FileReader *self, XBuffer *xbuf, size_t
 extern rfilestat_t FileReader_readStringLine(FileReader *self, XBuffer *xbuf, size_t limitlen,
                                              size_t *readlen);
 extern rfilestat_t FileReader_seek(FileReader *self, off_t offset, int whence);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _FILE_READER_H_ */

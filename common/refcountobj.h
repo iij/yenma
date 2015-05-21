@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2014,2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -16,6 +16,10 @@
 #include <stddef.h>
 #include <pthread.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define RefCountObj_MEMBER            \
     size_t refcount;                  \
     pthread_mutex_t refcount_lock;    \
@@ -30,5 +34,9 @@ typedef struct RefCountObj {
 
 extern RefCountObj *RefCountObj_ref(RefCountObj *self);
 extern void RefCountObj_unref(RefCountObj *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __REFCOUNT_OBJ_H__ */

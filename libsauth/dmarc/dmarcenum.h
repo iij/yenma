@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2012-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -11,6 +11,10 @@
 
 #ifndef __DMARC_ENUM_H__
 #define __DMARC_ENUM_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum DmarcAlignmentMode {
     DMARC_ALIGN_MODE_NULL = 0,
@@ -51,5 +55,9 @@ extern DmarcReportingOption DmarcEnum_lookupReportingOptionByName(const char *ke
 extern DmarcReportingOption DmarcEnum_lookupReportingOptionByNameSlice(const char *head,
                                                                        const char *tail);
 extern const char *DmarcEnum_lookupReportingOptionByValue(DmarcReportingOption value);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DMARC_ENUM_H__ */

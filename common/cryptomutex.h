@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2009 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -12,7 +12,15 @@
 #ifndef __CRYPTO_MUTEX_H__
 #define __CRYPTO_MUTEX_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void Crypto_mutex_init(void);
 void Crypto_mutex_cleanup(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CRYPTO_MUTEX_H__ */

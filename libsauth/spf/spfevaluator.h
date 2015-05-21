@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2007-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -25,6 +25,10 @@
 #include "dnsresolv.h"
 #include "spf.h"
 #include "spfevalpolicy.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct SpfEvaluator {
     const SpfEvalPolicy *policy;
@@ -55,5 +59,9 @@ struct SpfEvaluator {
 
 extern const char *SpfEvaluator_getDomain(const SpfEvaluator *self);
 extern int SpfEvaluator_isValidatedDomainName(const SpfEvaluator *self, const char *revdomain);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SPF_EVALUATOR_H__ */

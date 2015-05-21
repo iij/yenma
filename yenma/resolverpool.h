@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2014,2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -15,6 +15,10 @@
 #include <sys/types.h>
 #include "dnsresolv.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct ResolverPool ResolverPool;
 
 extern ResolverPool *ResolverPool_new(DnsResolver_initializer *initializer, const char *initfile,
@@ -23,5 +27,9 @@ extern ResolverPool *ResolverPool_new(DnsResolver_initializer *initializer, cons
 extern DnsResolver *ResolverPool_acquire(ResolverPool *self);
 extern void ResolverPool_release(ResolverPool *self, DnsResolver *resolver);
 extern void ResolverPool_free(ResolverPool *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __RESOLVER_POOL_H__ */

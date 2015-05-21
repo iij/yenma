@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -26,6 +26,10 @@
 #include "yenma.h"
 #include "yenmacontext.h"
 #include "yenmaconfig.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct YenmaSession {
 // per connection
@@ -55,5 +59,9 @@ typedef struct YenmaSession {
 extern YenmaSession *YenmaSession_new(YenmaContext *yenmactx);
 extern void YenmaSession_reset(YenmaSession *self);
 extern void YenmaSession_free(YenmaSession *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __YENMA_SESSION_H__ */

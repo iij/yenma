@@ -46,6 +46,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * This structure must be the first member of the data structure in
  * the rbtree.  This allows easy casting between an rbnode_t and the
@@ -191,5 +195,9 @@ rbnode_t *rbtree_previous(rbnode_t *rbtree);
  */
 void traverse_postorder(rbtree_t* tree, void (*func)(rbnode_t*, void*),
 	void* arg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* UTIL_RBTREE_H_ */

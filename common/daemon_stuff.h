@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -14,6 +14,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct PidFile PidFile;
 
 extern int close_tty(void);
@@ -24,5 +28,9 @@ extern int seteuidgid(const char *username, const char **errstr);
 extern PidFile *PidFile_create(const char *path, bool with_lock, const char **errstr);
 extern bool PidFile_isLocked(const char *path, const char **errstr);
 extern void PidFile_close(PidFile *pidfile, bool with_unlink);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DAEMON_STUFF_H__ */

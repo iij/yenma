@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012,2013 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2012-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -16,6 +16,10 @@
 #include "dnsresolv.h"
 #include "dkim.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct DkimAtps DkimAtps;
 
 extern DkimStatus DkimAtps_build(const char *keyval, DkimAtps **atps_record);
@@ -23,5 +27,9 @@ extern DkimStatus DkimAtps_lookup(const char *atps_domain,
                                   const char *sdid, DkimHashAlgorithm hashalg,
                                   DnsResolver *resolver, DkimAtps **atps_record);
 extern void DkimAtps_free(DkimAtps *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DKIM_ATPS_H__ */

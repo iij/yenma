@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2010-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -14,6 +14,10 @@
 
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct AtomicCounter AtomicCounter;
 
 extern AtomicCounter *AtomicCounter_new(void);
@@ -22,5 +26,9 @@ extern int AtomicCounter_peek(AtomicCounter *self, int32_t *counter);
 extern int AtomicCounter_increment(AtomicCounter *self);
 extern int AtomicCounter_decrement(AtomicCounter *self);
 extern int AtomicCounter_wait0(AtomicCounter *self, time_t timeout);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __ATOMIC_COUNTER_H__ */

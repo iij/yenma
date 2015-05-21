@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -26,6 +26,10 @@
 #include "yenmacontext.h"
 #include "yenmaconfig.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MILTERNAME "yenma"
 #if !defined(LIBWRAP_DAEMON_NAME)
 #define LIBWRAP_DAEMON_NAME "yenma-control"
@@ -42,5 +46,9 @@ extern AtomicCounter *g_yenma_conn_counter;
 extern struct smfiDesc yenma_descr;
 
 extern YenmaContext *yenma_get_context_reference(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __YENMA_H__ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2009 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -13,6 +13,10 @@
 #define __STR_PAIR_LIST_H__
 
 #include <sys/types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct StrPairList;
 typedef struct StrPairList StrPairList;
@@ -39,5 +43,9 @@ extern StrPairListItem *StrPairList_findIgnoreCaseByKey(const StrPairList *self,
 
 extern const char *StrPairListItem_key(const StrPairListItem *self);
 extern const char *StrPairListItem_value(const StrPairListItem *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __STR_PAIR_LIST_H__ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2009 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -14,6 +14,14 @@
 
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern int bitmemcmp(const void *s1, const void *s2, size_t bits);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __BITMEMCMP_H__ */

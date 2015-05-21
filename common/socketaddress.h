@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2012-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -16,6 +16,10 @@
 #include <sys/types.h>
 #include <stdbool.h>
 #include <netinet/in.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MAX_NUMERICSERV_LEN 5   // = strlen("65535")
 #define MAX_NUMERICINFO_LEN (INET6_ADDRSTRLEN + MAX_NUMERICSERV_LEN + 3)    // "[%s]:%s" (does not include terminating null character)
@@ -36,5 +40,9 @@ extern int SockAddr_getNumericNameInfo(const struct sockaddr *addr, socklen_t *s
 extern int SockAddr_getNumericNameInfoFromInetAddr(sa_family_t sa_family, const void *ipaddr,
                                                    char *buf, size_t buflen);
 extern int SockAddr_getNumericPeerName(int fd, bool with_port, char *buf, size_t buflen);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __SOCKET_ADDRESS_H__

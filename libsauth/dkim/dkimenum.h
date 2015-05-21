@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2013 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -11,6 +11,10 @@
 
 #ifndef __DKIM_ENUM_H__
 #define __DKIM_ENUM_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // http://www.iana.org/assignments/dkim-parameters/dkim-parameters.xml
 
@@ -94,5 +98,9 @@ extern const char *DkimEnum_lookupQueryMethodByValue(DkimQueryMethod value);
 extern DkimAdspPractice DkimEnum_lookupPracticeByName(const char *keyword);
 extern DkimAdspPractice DkimEnum_lookupPracticeByNameSlice(const char *head, const char *tail);
 extern const char *DkimEnum_lookupPracticeByValue(DkimAdspPractice value);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DKIM_ENUM_H__ */

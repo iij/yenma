@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2009 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -14,6 +14,10 @@
 
 #include <sys/types.h>
 #include <stdarg.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum _wsock_stat {
     WSOCKSTAT_OK = 0,
@@ -43,5 +47,9 @@ extern wsockstat_t SocketWriter_writeFormatString(SocketWriter *self, const char
     __attribute__ ((format(printf, 2, 3)));
 extern wsockstat_t SocketWriter_writeVFormatString(SocketWriter *self, const char *format,
                                                    va_list ap);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SOCKET_WRITER_H_ */

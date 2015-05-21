@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -14,6 +14,10 @@
 
 #include <stdbool.h>
 #include "spf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct SpfEvalPolicy {
     // whether to lookup SPF RR (type 99).
@@ -63,5 +67,9 @@ struct SpfEvalPolicy {
     // threshold of handling "ip6-cidr-length" as malicious
     unsigned char malicious_ip6_cidr_length;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SPF_EVAL_POLICY_H__ */

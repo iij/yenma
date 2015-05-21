@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2012-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -20,6 +20,10 @@
 #include "dmarc.h"
 #include "dmarcenum.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct DmarcRecord DmarcRecord;
 
 extern DkimStatus DmarcRecord_build(const char *domain, const char *keyval, DmarcRecord **dmarc_record);
@@ -32,5 +36,9 @@ extern DmarcReceiverPolicy DmarcRecord_getSubdomainPolicy(const DmarcRecord *sel
 extern DmarcAlignmentMode DmarcRecord_getSpfAlignmentMode(const DmarcRecord *self);
 extern DmarcAlignmentMode DmarcRecord_getDkimAlignmentMode(const DmarcRecord *self);
 extern uint8_t DmarcRecord_getSamplingRate(const DmarcRecord *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DMARC_RECORD_H__ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -18,6 +18,10 @@
 #include "spf.h"
 #include "dkim.h"
 #include "dmarc.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct AuthStatistics {
     pthread_mutex_t lock;
@@ -38,5 +42,9 @@ extern void AuthStatistics_increment(AuthStatistics *self, SpfScore spf_score, S
                                      DkimBaseScore dkim_score, DkimAdspScore dkim_adsp_score,
                                      DmarcScore dmarc_score);
 extern void AuthStatistics_dump(const AuthStatistics *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __AUTH_STATS_H__ */

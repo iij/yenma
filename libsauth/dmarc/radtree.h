@@ -6,6 +6,10 @@
 #ifndef RADTREE_H
 #define RADTREE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct radnode;
 
 /** length of the binary string */
@@ -169,5 +173,9 @@ radstrlen_t bstr_common_ext(uint8_t* x, radstrlen_t xlen, uint8_t* y,
 /** true if one is prefix of the other */
 int bstr_is_prefix_ext(uint8_t* p, radstrlen_t plen, uint8_t* x,
 	radstrlen_t xlen);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* RADTREE_H */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2007-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -15,6 +15,10 @@
 #include <stdbool.h>
 #include "foldstring.h"
 #include "inetmailbox.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /// Authentication-Results header field name
 #define AUTHRESULTSHDR  "Authentication-Results"
@@ -75,5 +79,9 @@ extern bool AuthResult_compareAuthservId(const char *field, const char *hostname
 #define AuthResult_reset(_self) FoldString_reset(_self)
 #define AuthResult_status(_self)    FoldString_status(_self)
 #define AuthResult_getFieldBody(_self)  FoldString_getString(_self)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*__AUTH_RESULT_H__*/

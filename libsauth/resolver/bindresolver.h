@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2014,2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -14,6 +14,14 @@
 
 #include "dnsresolv.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern DnsResolver *BindResolver_new(const char *initfile);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __BIND_RESOLVER_H__ */

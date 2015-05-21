@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -16,9 +16,17 @@
 #include "spf.h"
 #include "spfrecord.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern SpfStat SpfMacro_parseDomainSpec(const SpfEvaluator *evaluator, const char *head,
                                         const char *tail, const char **nextp, XBuffer *xbuf);
 extern SpfStat SpfMacro_parseExplainString(const SpfEvaluator *evaluator, const char *head,
                                            const char *tail, const char **nextp, XBuffer *xbuf);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SPF_MACRO_H__ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2009 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -15,6 +15,10 @@
 #include <sys/types.h>
 #include <stdbool.h>
 #include "xbuffer.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum _rsock_stat {
     RSOCKSTAT_OK = 0,
@@ -39,5 +43,9 @@ extern rsockstat_t SocketReader_readString(SocketReader *self, XBuffer *xbuf, si
                                            size_t *readlen);
 extern rsockstat_t SocketReader_readStringLine(SocketReader *self, XBuffer *xbuf, size_t limitlen,
                                                size_t *readlen);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SOCKET_READER_H_ */

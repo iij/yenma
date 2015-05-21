@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -14,6 +14,10 @@
 
 #include <stdbool.h>
 #include "dkim.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct DkimCanonicalizer DkimCanonicalizer;
 
@@ -36,5 +40,9 @@ extern DkimStatus DkimCanonicalizer_body(DkimCanonicalizer *self, const unsigned
                                          size_t *canonsize);
 extern DkimStatus DkimCanonicalizer_finalizeBody(DkimCanonicalizer *self,
                                                  const unsigned char **canonbuf, size_t *canonsize);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DKIM_CANONICALIZER_H__ */

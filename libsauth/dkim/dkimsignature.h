@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -19,6 +19,10 @@
 #include "dkimenum.h"
 #include "inetmailbox.h"
 #include "dkimtaglistobject.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct DkimSignature DkimSignature;
 
@@ -74,5 +78,9 @@ extern const char *DkimSignature_getAtpsDomain(const DkimSignature *self);
 extern DkimStatus DkimSignature_setAtpsDomain(DkimSignature *self, const char *atps_domain);
 extern DkimHashAlgorithm DkimSignature_getAtpsHashAlgorithm(const DkimSignature *self);
 extern void DkimSignature_setAtpsHashAlgorithm(DkimSignature *self, DkimHashAlgorithm atps_hashalg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DKIM_SIGNATURE_H__ */

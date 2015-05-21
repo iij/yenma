@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -18,6 +18,10 @@
 
 #include "fieldmask.h"
 #include "dkim.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct DkimTagListObject DkimTagListObject;
 
@@ -50,5 +54,10 @@ extern DkimStatus DkimTagListObject_build(DkimTagListObject *self, const char *r
                                           bool ignore_syntax_error);
 
 #define DKIM_TAGLISTOBJECT_TAG_NO_AS_DEFAULT_VALUE -1
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DKIM_TAG_LIST_OBJECT_H__ */

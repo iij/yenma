@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -13,6 +13,10 @@
 #define __SPF_ENUM_H__
 
 #include "spf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum SpfQualifier {
     SPF_QUALIFIER_NULL = 0,
@@ -77,5 +81,9 @@ typedef enum SpfTermParamType {
     SPF_TERM_PARAM_IP4,
     SPF_TERM_PARAM_IP6,
 } SpfTermParamType;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SPF_ENUM_H__ */

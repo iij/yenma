@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -17,6 +17,10 @@
 #include "spf.h"
 #include "dkim.h"
 #include "dmarc.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct ValidatedResult {
     bool spf_eval_by_sender;    // SPF の検証に EnvFrom を使ったか HELO を使ったか (HELOの場合 false)
@@ -36,5 +40,9 @@ typedef struct ValidatedResult {
 extern ValidatedResult *ValidatedResult_new(void);
 extern void ValidatedResult_reset(ValidatedResult *self);
 extern void ValidatedResult_free(ValidatedResult *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __VALIDATED_RESULT_H__ */

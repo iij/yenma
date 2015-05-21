@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -19,6 +19,10 @@
 #include "dkim.h"
 #include "dkimsignature.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct DkimDigester DkimDigester;
 
 extern DkimStatus DkimDigester_new(DkimHashAlgorithm digest_alg,
@@ -36,5 +40,9 @@ extern DkimStatus DkimDigester_signMessage(DkimDigester *self, const InetMailHea
                                            DkimSignature *signature, EVP_PKEY *pkey);
 extern DkimStatus DkimDigester_enableC14nDump(DkimDigester *self, const char *fnHeaderDump,
                                               const char *fnBodyDump);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DKIM_DIGESTER_H__ */
