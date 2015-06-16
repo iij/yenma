@@ -185,8 +185,8 @@ yenma_dkimv_eom(YenmaSession *session)
         for (size_t sigidx = 0; sigidx < signum; ++sigidx) {
             const DkimFrameResult *result = DkimVerifier_getFrameResult(session->verifier, sigidx);
             if (0 == sigidx) {
-                // ほとんどのメールには1つしか署名がついていないと決めつけて,
-                // 先頭の署名のみ統計対象とする.
+                // Most of messages have only one DKIM signature at most.
+                // So we count the first DKIM verification result only here.
                 session->validated_result->dkim_score = result->score;
             }   // end if
 
@@ -251,7 +251,14 @@ yenma_dkimv_eom(YenmaSession *session)
             DkimAtpsScore atps_score;
             if (!DkimVerifier_getPolicyFrameResult
                 (session->verifier, i, &author, &adsp_score, &atps_score)) {
+                // must not reach here
                 continue;
+            }   // end if
+
+            if (0 == i) {
+                // Most of messages have only one mailbox in the From header.
+                // So we count the first DKIM ADSP score only here.
+                session->validated_result->dkim_adsp_score = adsp_score;
             }   // end if
 
             // ADSP
