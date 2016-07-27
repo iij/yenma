@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2016 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -174,6 +174,7 @@ extern void DkimVerificationPolicy_acceptFutureSignature(DkimVerificationPolicy 
 extern void DkimVerificationPolicy_verifyAtpsDelegation(DkimVerificationPolicy *self, bool flag);
 extern void DkimVerificationPolicy_setRfc4871Compatible(DkimVerificationPolicy *self, bool enable);
 extern void DkimVerificationPolicy_setMinRSAKeyLength(DkimVerificationPolicy *self, unsigned int keylen);
+extern void DkimVerificationPolicy_setMaxClockSkew(DkimVerificationPolicy *self, time_t skew);
 
 // DkimVerifier
 extern void DkimVerifier_free(DkimVerifier *self);

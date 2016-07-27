@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2016 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -39,6 +39,8 @@ struct DkimVerificationPolicy {
     // acceptable minimum RSA key strength.
     // 0 means no limitations are applied to RSA key length.
     unsigned int min_rsa_key_length;
+    // Maximum number of seconds of clock skew to validate DKIM signatures.
+    time_t max_clock_skew;
 };
 
 #ifdef __cplusplus

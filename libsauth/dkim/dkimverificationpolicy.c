@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2016 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -137,3 +137,10 @@ DkimVerificationPolicy_setMinRSAKeyLength(DkimVerificationPolicy *self, unsigned
     assert(NULL != self);
     self->min_rsa_key_length = keylen;
 }   // end function: DkimVerificationPolicy_setMinRSAKeyLength
+
+void
+DkimVerificationPolicy_setMaxClockSkew(DkimVerificationPolicy *self, time_t skew)
+{
+    assert(NULL != self);
+    self->max_clock_skew = skew;
+}   // end function: DkimVerificationPolicy_setMaxClockSkew

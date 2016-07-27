@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2016 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -342,7 +342,7 @@ DkimVerifier_setupFrame(DkimVerifier *self, const char *headerf, const char *hea
 
     // check whether the signature has a future timestamp
     if (!self->vpolicy->accept_future_signature) {
-        frame->status = DkimSignature_checkFutureTimestamp(frame->signature);
+        frame->status = DkimSignature_checkFutureTimestamp(frame->signature, self->vpolicy->max_clock_skew);
         if (DSTAT_OK != frame->status) {
             return frame->status;
         }   // end if

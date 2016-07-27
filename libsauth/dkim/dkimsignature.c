@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2016 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -809,7 +809,7 @@ DkimSignature_isExpired(const DkimSignature *self)
  * @return DSTAT_OK if the timestamp is valid, DSTAT_PERMFAIL_INCONSISTENT_TIMESTAMP if invalid.
  */
 DkimStatus
-DkimSignature_checkFutureTimestamp(const DkimSignature *self)
+DkimSignature_checkFutureTimestamp(const DkimSignature *self, time_t max_clock_skew)
 {
     /*
      * treats DKIM signatures signed in the future as invalid (PERMFAIL)
@@ -818,7 +818,7 @@ DkimSignature_checkFutureTimestamp(const DkimSignature *self)
      * timestamp in the future.
      */
     if (0LL < self->signing_timestamp
-        && (long long) self->verification_time < self->signing_timestamp) {
+        && (long long) self->verification_time + (long long) max_clock_skew < self->signing_timestamp) {
         DkimLogPermFail("this signature had signed in the future: timestamp=%lld, now=%ld",
                         self->signing_timestamp, self->verification_time);
         return DSTAT_PERMFAIL_INCONSISTENT_TIMESTAMP;

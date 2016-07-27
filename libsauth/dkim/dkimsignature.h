@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2016 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -28,7 +28,7 @@ typedef struct DkimSignature DkimSignature;
 
 extern DkimSignature *DkimSignature_new(void);
 extern DkimStatus DkimSignature_isExpired(const DkimSignature *self);
-extern DkimStatus DkimSignature_checkFutureTimestamp(const DkimSignature *self);
+extern DkimStatus DkimSignature_checkFutureTimestamp(const DkimSignature *self, time_t max_clock_skew);
 extern DkimStatus DkimSignature_build(const char *headerf,
                                       const char *headerv, DkimSignature **signature);
 extern void DkimSignature_free(DkimSignature *self);

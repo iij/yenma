@@ -34,6 +34,7 @@ Dkim.Verify: true
 Dkim.SignHeaderLimit: 5
 Dkim.AcceptExpiredSignature: false
 Dkim.Rfc4871Compatible: false
+Dkim.MaxClockSkew: 0
 DkimAdsp.Verify: false
 
 ## DMARC

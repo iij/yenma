@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2016 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -71,6 +71,7 @@ typedef struct YenmaConfig {
     uint64_t dkim_signheader_limit;
     bool dkim_rfc4871_compatible;
     uint64_t dkim_min_rsa_key_length;
+    time_t dkim_max_clock_skew;
     bool dkim_atps_verify;
     bool dkim_adsp_verify;
     char *dkim_canon_dump_dir;

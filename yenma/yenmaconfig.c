@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2016 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -160,6 +160,9 @@ static const ConfigEntry yenma_config_table[] = {
 
     {"Dkim.MinRSAKeyLength", CONFIG_TYPE_UINT64, "0",
      offsetof(YenmaConfig, dkim_min_rsa_key_length), NULL},
+
+    {"Dkim.MaxClockSkew", CONFIG_TYPE_TIME, "0",
+     offsetof(YenmaConfig, dkim_max_clock_skew), NULL},
 
     {"DkimAtps.Verify", CONFIG_TYPE_BOOLEAN, "false",
      offsetof(YenmaConfig, dkim_atps_verify), NULL},
