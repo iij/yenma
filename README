@@ -1,13 +1,13 @@
-                            README of ENMA
-                           xxxxxxxx xx, 2014
+                            README of YENMA
+                           xxxxxxxx xx, 2017
 
-* ENMA
+* YENMA
 
-  ENMA is a milter program for the domain authentication technologies.
+  YENMA is a milter program for the domain authentication technologies.
   It authenticates sender's address with SPF, Sender ID, DKIM and DKIM
   ADSP, then labels the result onto the Authentication-Results: field.
 
-  ENMA implements the following RFCs and an Internet Draft:
+  YENMA implements the following RFCs and Internet Drafts:
 
   - RFC4406 (Sender ID: Authenticating E-Mail)
   - RFC4407 (Purported Responsible Address)
@@ -22,17 +22,20 @@
   - RFC7001 (Authentication-Results Header Field)
   - RFC7208 (Sender Policy Framework)
   - draft-kucherawy-dmarc-base-04 (DMARC)
+  - draft-akagiri-dmarc-virtual-verification-02 (Virtual DMARC)
 
-  ENMA is developed by IIJ. IIJ has been using several domain
-  authentication software, though, all of them appeared unstable. ENMA
-  is designed and implemented in order to stand large ISP's operation
+  YENMA is developed by IIJ. IIJ has been using several domain
+  authentication software programs, though, all of them appeared unstable. YENMA
+  is designed and implemented in order to withstand large ISP's operation
   and is well-tested.
 
 * Functionality
 
+** Domain authentication
+
   - SPF authentication
 
-    Enma extracts a sender domain from SMTP MAIL FROM and looks up
+    YENMA extracts a sender domain from SMTP MAIL FROM and looks up
     DNS. If "<>" is specified in SMTP MAIL FROM, it extracts a domain
     from SMTP EHLO/HELO. It records authentication result onto the
     Authentication-Results: field. The Received-SPF: field is not
@@ -40,43 +43,97 @@
 
   - Sender ID authentication
 
-    Enma extracts a sender domain from a mail header with RPA and
+    YENMA extracts a sender domain from a mail header with RPA and
     looks up DNS. It records authentication result onto the
     Authentication-Results: field.
 
   - DKIM authentication
 
-    Enma extracts a sender domain from the DKIM-Signature field and
-    looks up DNS. Then it checks the DKIM signature to verify
+    YENMA extracts a sender domain from the DKIM-Signature field and
+    looks up DNS. Then it checks the DKIM signature to verify the
     authenticity of the sender domain and integrity of the mail body.
     It records authentication result onto the Authentication-Results:
+    field.
 
   - DKIM ADSP check
 
     If the result of DKIM authentication is "pass" and the sender and
-    the signer is the same (the From: field and the value of the "i"
-    tag), Enma records "pass" without looking up DNS.
+    the signer is the same (i.e. the From: field and the value of the
+    "i" tag), YENMA records "pass" without looking up DNS.
 
     Otherwise, it extracts a sender domain from the From: field and
     looks up DNS to obtain ADSP information, then records the
     authentication result onto the Authentication-Results: field.
 
+  - DMARC check
+
+    YENMA extracts sender addresses from From: field and looks up DNS
+    to obtain DMAC policy, then records the authentication result onto
+    the Authentication-Results: field.
+
+    The mail blocking mechanism based on DMARC check is not implemented yet.
+
+    If you use the check mechanism, set the Public Suffix list to
+    Dmarc.PublicSuffixList in the configuration file of YENMA.
+
+  - Virtual DMARC check
+
+    If DMARC policy is not found on DNS in the DMARC check process,
+    YENMA virtually executes DMARC check using the default policy
+    and records the result onto the Authentication-Results: field.
+
   - Inserting/deleting the Authentication-Results: field
 
-    Recording results of SPF authentication and Sender ID
+    YENMA records results of SPF authentication and Sender ID
     authentication onto the Authentication-Results: field. Also, to
-    prevent insertion of faked Authentication-Results: fields, the
-    fields which contains the hostname specified with
+    prevent insertion of forged Authentication-Results: fields, the
+    fields which contain the hostname specified with
     authresult.identifier are deleted.
+
+** Control Commands
+
+  By specifying "Service.ControlSocket" in the configuration file,
+  you can issue the control commands through the socket. If you use
+  the control commands, you should properly restrict the access sources
+  by TCP Wrapper, iptables and so on. You can use access control service
+  based on TCP wrapper by the service named "yenma-control"
+  if installing TCP Wrapper (libwrap) when building YENMA.
+
+  Commands available are the following:
+
+  - "SHOW-COUNTER", "RESET-COUNTER"
+    shows the statistics of authentication results.
+    "SHOW-COUNTER" only shows the results, and "RESET-COUNTER"
+    shows results and resets the counter atomically.
+
+  - "RELOAD"
+    reloads the configuration file. You should note that
+    there are some configuration arguments able to reload,
+    others unable to reload.
+
+  - "SHUTDOWN", "GRACEFUL"
+    shutdowns the process. "SHUTDOWN" is executed immediately.
+    "GRACEFUL" shutdowns the process after either all connections
+    are terminated or the time specified
+    "Service.GracefulShutdownTimeout" in the configuration file has passed.
+    No commands are executable after issuing both commands.
+
+  - "QUIT"
+    closes the session for the control commands.
+
+* Configuration
+
+  For the detailed information about the configuration arguments,
+  you can refer to example/yenma.conf.
 
 * Contact info
 
-  You can download ENMA packages at the following website:
+  You can download YENMA packages at the following website:
 
     http://enma.sourceforge.net/
 
   Please use the following mailing lists for questions and discussions
-  on ENMA:
+  on YENMA:
 
     enma-users@lists.sourceforge.net (English)
     enma-users-jp@lists.sourceforge.net (Japanese)
