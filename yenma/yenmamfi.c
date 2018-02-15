@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -61,7 +61,6 @@
         } \
     } while (0)
 
-
 static int
 yenma_insert_authenticationresults_header(SMFICTX *ctx, YenmaSession *session)
 {
@@ -85,18 +84,34 @@ yenma_invoke_actions(SMFICTX *ctx, YenmaSession *session, sfsistat *action)
         return insert_stat;
     }   // end if
 
-    // rejection according to DMARC
-    if (session->ctx->cfg->dmarc_verify && SMFIS_CONTINUE != session->ctx->dmarc_reject_action
-            && DMARC_RECEIVER_POLICY_REJECT == DmarcAligner_getReceiverPolicy(session->aligner, true)) {
-        LogInfo("DMARC reject action taken: action=%s", YenmaConfig_lookupSmtpRejectActionByValue(session->ctx->dmarc_reject_action));
-        if (SMFIS_REJECT == session->ctx->dmarc_reject_action || SMFIS_TEMPFAIL == session->ctx->dmarc_reject_action) {
-            if (MI_SUCCESS != smfi_setreply(ctx, session->ctx->cfg->dmarc_reject_reply_code,
-                    session->ctx->cfg->dmarc_reject_enhanced_status_code,
-                    session->ctx->cfg->dmarc_reject_message)) {
-                LogWarning("failed to set SMTP response: rcode=%s, xcode=%s, msg=%s", NNSTR(session->ctx->cfg->dmarc_reject_reply_code), NNSTR(session->ctx->cfg->dmarc_reject_enhanced_status_code), NNSTR(session->ctx->cfg->dmarc_reject_message));
+    // rejection (or other action) according to DMARC
+    if (session->ctx->cfg->dmarc_verify && SMFIS_CONTINUE != session->ctx->dmarc_reject_action) {
+        bool policy_reject = false;
+        size_t alignernum = PtrArray_getCount(session->aligners);
+        for (size_t i = 0; i < alignernum; ++i) {
+            DmarcAligner *aligner = (DmarcAligner *) PtrArray_get(session->aligners, i);
+            if (DMARC_RECEIVER_POLICY_REJECT == DmarcAligner_getReceiverPolicy(aligner, true)) {
+                policy_reject = true;
+                break;
             }   // end if
+        }   // end for
+
+        if (policy_reject) {
+            LogInfo("DMARC reject action taken: action=%s",
+                    YenmaConfig_lookupSmtpRejectActionByValue(session->ctx->dmarc_reject_action));
+            if (SMFIS_REJECT == session->ctx->dmarc_reject_action ||
+                SMFIS_TEMPFAIL == session->ctx->dmarc_reject_action) {
+                if (MI_SUCCESS != smfi_setreply(ctx, session->ctx->cfg->dmarc_reject_reply_code,
+                                                session->ctx->cfg->dmarc_reject_enhanced_status_code,
+                                                session->ctx->cfg->dmarc_reject_message)) {
+                    LogWarning("failed to set SMTP response: rcode=%s, xcode=%s, msg=%s",
+                               NNSTR(session->ctx->cfg->dmarc_reject_reply_code),
+                               NNSTR(session->ctx->cfg->dmarc_reject_enhanced_status_code),
+                               NNSTR(session->ctx->cfg->dmarc_reject_message));
+                }   // end if
+            }   // end if
+            *action = session->ctx->dmarc_reject_action;
         }   // end if
-        *action = session->ctx->dmarc_reject_action;
     }   // end if
 
     // other actions will be here...
@@ -169,9 +184,9 @@ yenma_sidfv_build_auth_result(const YenmaSession *session, const char *pra_heade
 }   // end function: yenma_sidfv_build_auth_result
 
 /**
- * DKIM の検証と Authentication-Results ヘッダの付加をおこなう
- * @param session セッションコンテキスト
- * @return 正常終了の場合は true, エラーが発生した場合は false.
+ * DKIM verification and Authentication-Results header insertion
+ * @param session session context
+ * @return true on success, false on error.
  */
 static bool
 yenma_dkimv_eom(YenmaSession *session)
@@ -306,7 +321,7 @@ yenma_dkimv_eom(YenmaSession *session)
  * @param ready SPF の検証が続行可能かを受け取る変数へのポインタ.
  *        SPF の検証を続行可能な場合は true,
  *        SPF の検証をおこなうのに十分な情報が揃わなかった場合は false.
- * @return 正常終了した場合は true, エラーが発生した場合は false.
+ * @return true on success, false on error.
  */
 static bool
 yenma_spfv_prepare_request(YenmaSession *session, SpfEvaluator *evaluator, bool *spfready)
@@ -359,9 +374,9 @@ yenma_spfv_prepare_request(YenmaSession *session, SpfEvaluator *evaluator, bool 
 }   // end function: yenma_spfv_prepare_request
 
 /**
- * SPF の検証と Authentication-Results ヘッダの付加をおこなう.
- * @param session セッションコンテキスト
- * @return 正常終了の場合は true, エラーが発生した場合は false.
+ * SPF evaluation and Authentication-Results header insertion
+ * @param session session context
+ * @return true on success, false on error.
  */
 static bool
 yenma_spfv_eom(YenmaSession *session)
@@ -403,10 +418,10 @@ yenma_spfv_eom(YenmaSession *session)
     } else {
         // 必要なパラメーターが揃わず SPF 評価をスキップした場合は "permerror"
         /*
-         * [draft-kucherawy-sender-auth-header-14 2.4.3.]
-         * permerror:  The message could not be verified due to some error which
-         *    is unrecoverable, such as a required header field being absent.  A
-         *    later attempt is unlikley to produce a final result.
+         * [RFC7208] 2.6.7.
+         * A "permerror" result means the domain's published records could not
+         * be correctly interpreted.  This signals an error condition that
+         * definitely requires DNS operator intervention to be resolved.
          */
         session->validated_result->spf_score = SPF_SCORE_PERMERROR;
         const char *spfresultexp = SpfEnum_lookupScoreByValue(session->validated_result->spf_score);
@@ -422,7 +437,7 @@ yenma_spfv_eom(YenmaSession *session)
  *        返値が true だった場合のみセットされる.
  *        SPF の検証を続行可能な場合は true,
  *        SPF の検証をおこなうのに十分な情報が揃わなかった場合は false.
- * @return 正常終了した場合は true, エラーが発生した場合は false.
+ * @return true on success, false on error.
  */
 static bool
 yenma_sidfv_prepare_request(YenmaSession *session, SpfEvaluator *evaluator, bool *sidfready,
@@ -477,9 +492,9 @@ yenma_sidfv_prepare_request(YenmaSession *session, SpfEvaluator *evaluator, bool
 }   // end function: yenma_sidfv_prepare_request
 
 /**
- * SPF の検証と Authentication-Results ヘッダの付加をおこなう.
- * @param session セッションコンテキスト
- * @return 正常終了の場合は true, エラーが発生した場合は false.
+ * SenderID evaluation and Authentication-Results header insertion
+ * @param session session context
+ * @return true on success, false on error.
  */
 static bool
 yenma_sidfv_eom(YenmaSession *session)
@@ -516,10 +531,10 @@ yenma_sidfv_eom(YenmaSession *session)
     } else {
         // 必要なパラメーターが揃わず SIDF 評価をスキップした場合は "permerror"
         /*
-         * [draft-kucherawy-sender-auth-header-14 2.4.3.]
-         * permerror:  The message could not be verified due to some error which
-         *    is unrecoverable, such as a required header field being absent.  A
-         *    later attempt is unlikley to produce a final result.
+         * [RFC7208] 2.6.7.
+         * A "permerror" result means the domain's published records could not
+         * be correctly interpreted.  This signals an error condition that
+         * definitely requires DNS operator intervention to be resolved.
          */
         session->validated_result->sidf_score = SPF_SCORE_PERMERROR;
         const char *sidfresultexp =
@@ -535,35 +550,81 @@ yenma_sidfv_eom(YenmaSession *session)
 static bool
 yenma_dmarcv_eom(YenmaSession *session)
 {
-    DkimStatus dmarc_stat = DmarcAligner_new(session->ctx->public_suffix, session->resolver, &session->aligner);
-    if (DSTAT_OK != dmarc_stat) {
-        LogNoResource();
-        return false;
-    }   // end if
+    /*
+     * [RFC7489] 6.6.1.
+     * The case of a syntactically valid multi-valued RFC5322.From field
+     * presents a particular challenge.  The process in this case is to
+     * apply the DMARC check using each of those domains found in the
+     * RFC5322.From field as the Author Domain and apply the most strict
+     * policy selected among the checks that fail.
+     */
 
-    DmarcScore score = DmarcAligner_check(session->aligner, session->headers, session->verifier, session->spfevaluator);
-    if (DMARC_SCORE_NULL == score) {
-        LogWarning("DmarcAligner_check failed");
-        return false;
-    }   // end if
-    const char *score_symbol = DmarcEnum_lookupScoreByValue(score);
-    (void) AuthResult_appendMethodSpec(session->authresult, AUTHRES_METHOD_DMARC, score_symbol);
+    // We evaluate DMARC policy against all of the header-From addresses
+    // and apply the most strict policy.
+    session->aligners = PtrArray_new(0, (void (*)(void *)) DmarcAligner_free);
 
-    const InetMailbox *author = NULL;
-    const InetMailboxArray *authors = NULL;
-    HeaderStautus author_stat = InetMailHeaders_extractAuthors(session->headers, &authors);
-    if (HEADER_STAT_OK == author_stat && 1 == InetMailboxArray_getCount(authors)
-        && NULL != (author = InetMailboxArray_get(authors, 0))) {
-        (void) AuthResult_appendPropSpecWithAddrSpec(session->authresult, AUTHRES_PTYPE_HEADER,
-                                                     AUTHRES_PROPERTY_FROM, author);
-        LogEvent("DMARC",
-                 AUTHRES_METHOD_DMARC "=%s, " AUTHRES_PTYPE_HEADER "." AUTHRES_PROPERTY_FROM
-                 "=%s@%s", score_symbol, InetMailbox_getLocalPart(author),
-                 InetMailbox_getDomain(author));
-    } else {
-        LogEvent("DMARC", AUTHRES_METHOD_DMARC "=%s", score_symbol);
+    bool author_found = false;
+    int headernum = InetMailHeaders_getCount(session->headers);
+    for (int i = 0; i < headernum; ++i) {
+        const char *headerf, *headerv;
+        InetMailHeaders_get(session->headers, i, &headerf, &headerv);
+        if (0 != strcasecmp(headerf, FROMHEADER)) {
+            continue;
+        }   // end if
+        const char *errptr = NULL;
+        InetMailboxArray *authors =
+            InetMailHeaders_parseMailboxList(headerv, STRTAIL(headerv), &errptr);
+        if (NULL == authors) {
+            if (NULL == errptr) {
+                LogNoResource();
+                return false;
+            } else {
+                // parse error
+                continue;
+            }   // end if
+        }   // end if
+        int authornum = InetMailboxArray_getCount(authors);
+        for (int j = 0; j < authornum; ++j) {
+            const InetMailbox *author = InetMailboxArray_get(authors, j);
+            DmarcAligner *aligner = NULL;
+            DkimStatus dmarc_stat =
+                DmarcAligner_new(session->ctx->public_suffix, session->resolver, &aligner);
+            if (DSTAT_OK != dmarc_stat) {
+                LogNoResource();
+                return false;
+            }   // end if
+            if (0 > PtrArray_append(session->aligners, aligner)) {
+                DmarcAligner_free(aligner);
+                LogNoResource();
+                return false;
+            }   // end if
+            DmarcScore score =
+                DmarcAligner_check(aligner, author, session->verifier, session->spfevaluator);
+            if (DMARC_SCORE_NULL == score) {
+                LogWarning("DmarcAligner_check failed");
+                return false;
+            }   // end if
+            const char *score_symbol = DmarcEnum_lookupScoreByValue(score);
+            (void) AuthResult_appendMethodSpec(session->authresult, AUTHRES_METHOD_DMARC,
+                                               score_symbol);
+            (void) AuthResult_appendPropSpecWithAddrSpec(session->authresult, AUTHRES_PTYPE_HEADER,
+                                                         AUTHRES_PROPERTY_FROM, author);
+            LogEvent("DMARC",
+                     AUTHRES_METHOD_DMARC "=%s, " AUTHRES_PTYPE_HEADER "." AUTHRES_PROPERTY_FROM
+                     "=%s@%s", score_symbol, InetMailbox_getLocalPart(author),
+                     InetMailbox_getDomain(author));
+
+            if (!author_found) {
+                session->validated_result->dmarc_score = score;
+                author_found = true;
+            }   // end if
+        }   // end for
+    }   // end for
+
+    if (!author_found) {
+        (void) AuthResult_appendMethodSpec(session->authresult, AUTHRES_METHOD_DMARC, "none");
+        session->validated_result->dmarc_score = DMARC_SCORE_NONE;
     }   // end if
-    session->validated_result->dmarc_score = score;
 
     return true;
 }   // end function: yenma_dmarcv_eom
@@ -937,15 +998,14 @@ yenmamfi_eoh(SMFICTX *ctx)
 
     // [DKIM] DKIM 検証処理の可否の判断
     if (session->ctx->cfg->dkim_verify) {
-        // DkimVerifier オブジェクトの初期化
+        // initialize DkimVerifier object
         DkimStatus setup_stat =
             DkimVerifier_new(session->ctx->dkim_vpolicy, session->resolver, session->headers,
                              session->keep_leading_header_space, &(session->verifier));
         if (DSTAT_INFO_NO_SIGNHEADER == setup_stat) {
-            // DKIM 署名ヘッダが1つもついていなかった場合
+            // No DKIM-Signature headers are found
             LogDebug("[DKIM-skip] No DKIM-Signature header found and verification is skipped.");
         } else if (DSTAT_ISCRITERR(setup_stat)) {
-            // エラーが発生した場合
             LogError("DkimVerifier_setup failed: error=%s", DkimStatus_getSymbol(setup_stat));
             return yenma_tempfail(session);
         }   // end if
@@ -981,7 +1041,6 @@ yenmamfi_body(SMFICTX *ctx, unsigned char *bodyp, size_t bodylen)
     if (session->ctx->cfg->dkim_verify) {
         DkimStatus body_stat = DkimVerifier_updateBody(session->verifier, bodyp, bodylen);
         if (DSTAT_ISCRITERR(body_stat)) {
-            // エラーが発生した場合
             LogError("DkimVerifier_body failed: error=%s", DkimStatus_getSymbol(body_stat));
             return yenma_tempfail(session);
         }   // end if

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -97,9 +97,9 @@ YenmaSession_reset(YenmaSession *self)
         DkimVerifier_free(self->verifier);
         self->verifier = NULL;
     }   // end if
-    if (NULL != self->aligner) {
-        DmarcAligner_free(self->aligner);
-        self->aligner = NULL;
+    if (NULL != self->aligners) {
+        PtrArray_free(self->aligners);
+        self->aligners = NULL;
     }   // end if
     if (NULL != self->envfrom) {
         InetMailbox_free(self->envfrom);
@@ -133,7 +133,7 @@ YenmaSession_free(YenmaSession *self)
     SpfEvaluator_free(self->spfevaluator);
     SpfEvaluator_free(self->sidfevaluator);
     DkimVerifier_free(self->verifier);
-    DmarcAligner_free(self->aligner);
+    PtrArray_free(self->aligners);
     InetMailHeaders_free(self->headers);
     ResolverPool_release(self->ctx->resolver_pool, self->resolver);
     InetMailbox_free(self->envfrom);

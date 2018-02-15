@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2014-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -69,7 +69,7 @@ DmarcAligner_retrieveRecord(DmarcAligner *self)
         return DSTAT_OK;
     case DSTAT_INFO_DNSRR_NOT_EXIST:
         /*
-         * [draft-kucherawy-dmarc-base-02] 16.2.
+         * [RFC7489] 11.2.
          * Code:  none
          * ...
          * Meaning:  No DMARC policy record was published for the aligned
@@ -80,7 +80,7 @@ DmarcAligner_retrieveRecord(DmarcAligner *self)
     case DSTAT_TMPERR_DNS_ERROR_RESPONSE:
     case DSTAT_SYSERR_DNS_LOOKUP_FAILURE:
         /*
-         * [draft-kucherawy-dmarc-base-02] 16.2.
+         * [RFC7489] 11.2.
          * Code:  temperror
          * ...
          * Meaning:  A temporary error occurred during DMARC evaluation.  A
@@ -94,7 +94,7 @@ DmarcAligner_retrieveRecord(DmarcAligner *self)
         break;
     default:
         /*
-         * [draft-kucherawy-dmarc-base-02] 16.2.
+         * [RFC7489] 11.2.
          * Code:  permerror
          * ...
          * Meaning:  A permanent error occurred during DMARC evaluation, such as
@@ -139,10 +139,10 @@ DmarcAligner_checkDkimAlignment(DmarcAligner *self, bool strict_mode)
     }   // end if
 
     /*
-     * [draft-kucherawy-dmarc-base-02] 3.1.4.1.
+     * [RFC7489] 3.1.1.
      * Note that a single email can contain multiple DKIM signatures, and it
      * is considered to be a DMARC "pass" if any DKIM signature is aligned
-     * and valid.
+     * and verifies.
      */
     size_t signum = DkimVerifier_getFrameCount(self->verifier);
     for (size_t sigidx = 0; sigidx < signum; ++sigidx) {
@@ -188,55 +188,12 @@ DmarcAligner_checkImpl(DmarcAligner *self, bool strict_mode)
 }   // end function: DmarcAligner_checkImpl
 
 DmarcScore
-DmarcAligner_check(DmarcAligner *self, InetMailHeaders *headers,
+DmarcAligner_check(DmarcAligner *self, const InetMailbox *author,
                    const DkimVerifier *dkimverifier, SpfEvaluator *spfevaluator)
 {
-    assert(NULL != headers);
+    assert(NULL != author);
 
-    const InetMailboxArray *authors = NULL;
-    HeaderStautus author_stat = InetMailHeaders_extractAuthors(headers, &authors);
-    switch (author_stat) {
-    case HEADER_STAT_OK:
-        // do nothing
-        break;
-    case HEADER_NOT_EXIST:
-    case HEADER_NOT_UNIQUE:
-    case HEADER_BAD_SYNTAX:
-        /*
-         * [draft-kucherawy-dmarc-base-02] 16.2.
-         * Code:  none
-         * ...
-         * Meaning:  No DMARC policy record was published for the aligned
-         *    identifier, or no aligned identifier could be extracted.
-         */
-        return self->score = DMARC_SCORE_NONE;
-    case HEADER_NO_RESOURCE:
-        LogNoResource();
-        return self->score = DMARC_SCORE_NULL;
-    default:
-        abort();
-    }   // end switch
-
-    /*
-     * [draft-kucherawy-dmarc-base-04] 10.1.
-     * In order to be processed by DMARC, a message must contain exactly one
-     * RFC5322 From: domain (a single From: field with a single domain in it).
-     * ...
-     * Such messages SHOULD be rejected.  If they are not, the Mail Receiver
-     * can either ignore the message entirely with respect to DMARC
-     * processing, or (if there are multiple identifiers) evaluate DMARC
-     * against all identifiers.
-     */
-    size_t author_num = InetMailboxArray_getCount(authors);
-    assert(0 < author_num);
-    self->authordomain = InetMailbox_getDomain(InetMailboxArray_get(authors, 0));
-    for (int i = 1; i < author_num; ++i) {
-        if (!InetDomain_equals(self->authordomain, InetMailbox_getDomain(InetMailboxArray_get(authors, i)))) {
-            self->authordomain = NULL;
-            return self->score = DMARC_SCORE_NONE;
-        }   // end if
-    }   // end for
-
+    self->authordomain = InetMailbox_getDomain(author);
     self->verifier = dkimverifier;
     self->evaluator = spfevaluator;
     self->record = NULL;
@@ -262,7 +219,7 @@ DmarcAligner_check(DmarcAligner *self, InetMailHeaders *headers,
     }   // end if
 
     /*
-     * [draft-kucherawy-dmarc-base-02] 16.2.
+     * [RFC7489] 11.2.
      * Code:  fail
      * ...
      * Meaning:  A DMARC policy record was published for the aligned
@@ -288,22 +245,24 @@ DmarcAligner_getReceiverPolicy(DmarcAligner *self, bool apply_sampling_rate)
     }   // end if
 
     switch (self->score) {
-    case DMARC_SCORE_NULL:  // DMARC evaluation is turned off.
+    case DMARC_SCORE_NULL: // DMARC evaluation is turned off.
     case DMARC_SCORE_NONE:
     case DMARC_SCORE_PASS:
-    case DMARC_SCORE_TEMPERROR: // memory allocation failure or DNS lookup failure
-    case DMARC_SCORE_PERMERROR: // DMARC record is (syntactically) broken.
+    case DMARC_SCORE_TEMPERROR:    // memory allocation failure or DNS lookup failure
+    case DMARC_SCORE_PERMERROR:    // DMARC record is (syntactically) broken.
         return self->policy = DMARC_RECEIVER_POLICY_NONE;
 
     case DMARC_SCORE_FAIL:;
         DmarcReceiverPolicy receiver_policy = DMARC_RECEIVER_POLICY_NULL;
-        if (!InetDomain_equals(self->authordomain, DmarcRecord_getDomain(self->record)) && DMARC_RECEIVER_POLICY_NULL != DmarcRecord_getSubdomainPolicy(self->record)) {
+        if (!InetDomain_equals(self->authordomain, DmarcRecord_getDomain(self->record))
+            && DMARC_RECEIVER_POLICY_NULL != DmarcRecord_getSubdomainPolicy(self->record)) {
             receiver_policy = DmarcRecord_getSubdomainPolicy(self->record);
         } else {
             receiver_policy = DmarcRecord_getReceiverPolicy(self->record);
         }   // end if
 
-        if (apply_sampling_rate && DmarcRecord_getSamplingRate(self->record) <= (uint8_t) (random() % 100)) {
+        if (apply_sampling_rate
+            && DmarcRecord_getSamplingRate(self->record) <= (uint8_t) (random() % 100)) {
             receiver_policy = DmarcReceiverPolicy_downgrade(receiver_policy);
         }   // end if
 

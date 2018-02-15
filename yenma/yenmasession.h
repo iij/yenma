@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2015 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2008-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -43,7 +43,7 @@ typedef struct YenmaSession {
     SpfEvaluator *spfevaluator;
     SpfEvaluator *sidfevaluator;
     DkimVerifier *verifier;
-    DmarcAligner *aligner;
+    PtrArray *aligners; // array of DmarcAligner
     InetMailHeaders *headers;
     InetMailbox *envfrom;
     char *raw_envfrom;          // store the raw envelope from address (without mail-param)

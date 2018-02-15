@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013,2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2013-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -45,7 +45,7 @@ typedef struct PublicSuffix PublicSuffix;
 
 extern DkimStatus DmarcAligner_new(const PublicSuffix *publicsuffix, DnsResolver *resolver, DmarcAligner **aligner);
 extern void DmarcAligner_free(DmarcAligner *self);
-extern DmarcScore DmarcAligner_check(DmarcAligner *self, InetMailHeaders *headers,
+extern DmarcScore DmarcAligner_check(DmarcAligner *self, const InetMailbox *author,
         const DkimVerifier *dkimverifier, SpfEvaluator *spfevaluator);
 extern DmarcReceiverPolicy DmarcAligner_getReceiverPolicy(DmarcAligner *self, bool apply_sampling_rate);
 

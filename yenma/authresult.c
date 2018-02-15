@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2007-2017 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -32,35 +32,42 @@
 #define AUTHRES_DEFAULT_BUFLEN 256
 
 /*
- * [RFC5451] 2.2.
+ * [RFC7601] 2.2.
  * authres-header = "Authentication-Results:" [CFWS] authserv-id
- *          [ CFWS version ]
- *          ( [CFWS] ";" [CFWS] "none" / 1*resinfo ) [CFWS] CRLF
- * authserv-id = dot-atom
- * version = 1*DIGIT [CFWS]
+ *          [ CFWS authres-version ]
+ *          ( no-result / 1*resinfo ) [CFWS] CRLF
+ * authserv-id = value
+ * authres-version = 1*DIGIT [CFWS]
+ * no-result = [CFWS] ";" [CFWS] "none"
  * resinfo = [CFWS] ";" methodspec [ CFWS reasonspec ]
  *           *( CFWS propspec )
  * methodspec = [CFWS] method [CFWS] "=" [CFWS] result
  * reasonspec = "reason" [CFWS] "=" [CFWS] value
  * propspec = ptype [CFWS] "." [CFWS] property [CFWS] "=" pvalue
- * method = dot-atom [ [CFWS] "/" [CFWS] version ]
- * result = dot-atom
- * ptype = "smtp" / "header" / "body" / "policy"
- * property = dot-atom
+ * method = Keyword [ [CFWS] "/" [CFWS] method-version ]
+ * method-version = 1*DIGIT [CFWS]
+ * result = Keyword
+ * ptype = Keyword
+ * property = special-smtp-verb / Keyword
+ * special-smtp-verb = "mailfrom" / "rcptto"
  * pvalue = [CFWS] ( value / [ [ local-part ] "@" ] domain-name )
  *          [CFWS]
- * [RFC5322] 3.2.4.
- * qtext           =   %d33 /             ; Printable US-ASCII
- *                    %d35-91 /          ;  characters not including
- *                    %d93-126 /         ;  "\" or the quote character
- *                    obs-qtext
- * qcontent        =   qtext / quoted-pair
- * quoted-string   =   [CFWS]
- *                    DQUOTE *([FWS] qcontent) [FWS] DQUOTE
- *                    [CFWS]
  * [RFC2045] 5.1.
+ * value := token / quoted-string
  * token := 1*<any (US-ASCII) CHAR except SPACE, CTLs,
  *          or tspecials>
+ * [RFC5321] 4.1.2.
+ * Keyword        = Ldh-str
+ * Ldh-str        = *( ALPHA / DIGIT / "-" ) Let-dig
+ * [RFC5322] 3.2.3.
+ * atom            =   [CFWS] 1*atext [CFWS]
+ * dot-atom-text   =   1*atext *("." 1*atext)
+ * dot-atom        =   [CFWS] dot-atom-text [CFWS]
+ * [RFC5322] 3.4.1.
+ * quoted-string   =   [CFWS]
+ *                     DQUOTE *([FWS] qcontent) [FWS] DQUOTE
+ *                     [CFWS]
+ * local-part      =   dot-atom / quoted-string / obs-local-part
  */
 
 const char *

@@ -161,7 +161,7 @@ SpfEvaluator_uniqueByScope(const SpfRawRecord *rawrecords, unsigned int recordnu
     return SPF_SCORE_NULL;
 }   // end function: SpfEvaluator_uniqueByScope
 
-static bool
+static SpfScore
 SpfEvaluator_incrementVoidLookupCounter(SpfEvaluator *self, dns_stat_t query_stat)
 {
     if (DNS_STAT_NODATA == query_stat || DNS_STAT_NXDOMAIN == query_stat) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2016 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -594,13 +594,6 @@ DkimVerifier_hasAuthorDomainSignature(const DkimVerifier *self, const char *auth
             const char *sdid = DkimSignature_getSdid(frame->signature);
             if (InetDomain_equals(sdid, author_domain)) {
                 // Author Domain Signature (= First Party Signature)
-                /*
-                 * [draft-kucherawy-sender-auth-header-20] 2.4.2.
-                 * pass:  This message had an author signature which validated.  (An
-                 *    ADSP check is not strictly required to be performed for this
-                 *    result, since a valid author domain signature satisfies all
-                 *    possible ADSP policies.)
-                 */
                 return true;
             }   // end if
         }   // end if

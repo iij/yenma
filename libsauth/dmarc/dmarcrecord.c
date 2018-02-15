@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2012-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -105,8 +105,8 @@ static const DkimTagListObjectFieldMap dmarc_record_field_table[] = {
 // private functions
 
 /*
- * [draft-kucherawy-dmarc-base-04] 5.3.
- * dmarc-version   = %x76 *WSP "=" %x44 %x4d %x41 %x52 %x43 %x31
+ * [RFC7489] 6.4.
+ * dmarc-version   = "v" *WSP "=" *WSP %x44 %x4d %x41 %x52 %x43 %x31
  */
 DkimStatus
 DmarcRecord_parse_v(DkimTagListObject *base __attribute__((unused)),
@@ -116,7 +116,7 @@ DmarcRecord_parse_v(DkimTagListObject *base __attribute__((unused)),
      * appearance at the head of record (0 == context->tag_no)
      * or set as default value (DKIM_TAGLISTOBJECT_TAG_NO_DEFAULT_VALUE == context->tag_no) are accepted.
      * error otherwise.
-     * [draft-kucherawy-dmarc-base-04] 5.2.
+     * [RFC7489] 6.3.
      * It MUST be the first tag in the list.
      */
     if (DKIM_TAGLISTOBJECT_TAG_NO_AS_DEFAULT_VALUE != context->tag_no && 0 < context->tag_no) {
@@ -128,7 +128,7 @@ DmarcRecord_parse_v(DkimTagListObject *base __attribute__((unused)),
     }   // end if
 
     // compare "DMARC1" tag case-sensitively
-    // [draft-kucherawy-dmarc-base-04] 5.2.
+    // [RFC7489] 6.3.
     // The value of this tag MUST match precisely
     if (0 < XSkip_string(context->value_head, context->value_tail, DMARC1_VERSION_TAG, nextp)) {
         return DSTAT_OK;
@@ -140,8 +140,8 @@ DmarcRecord_parse_v(DkimTagListObject *base __attribute__((unused)),
 }   // end function: DmarcRecord_parse_v
 
 /*
- * [draft-kucherawy-dmarc-base-04] 5.3.
- * dmarc-adkim     = %x61 %x64 %x6b %x69 %x6d *WSP "=" *WSP
+ * [RFC7489] 6.4.
+ * dmarc-adkim     = "adkim" *WSP "=" *WSP
  *                   ( "r" / "s" )
  */
 DkimStatus
@@ -173,8 +173,8 @@ DmarcRecord_parse_adkim(DkimTagListObject *base, const DkimTagParseContext *cont
 }   // end function: DmarcRecord_parse_adkim
 
 /*
- * [draft-kucherawy-dmarc-base-04] 5.3.
- * dmarc-aspf      = %x61 %x73 %x70 %x66 *WSP "=" *WSP
+ * [RFC7489] 6.4.
+ * dmarc-aspf      = "aspf" *WSP "=" *WSP
  *                   ( "r" / "s" )
  */
 DkimStatus
@@ -206,8 +206,8 @@ DmarcRecord_parse_aspf(DkimTagListObject *base, const DkimTagParseContext *conte
 }   // end function: DmarcRecord_parse_aspf
 
 /*
- * [draft-kucherawy-dmarc-base-04] 5.3.
- * dmarc-fo        = %x66 %x6f *WSP "=" *WSP
+ * [RFC7489] 6.4.
+ * dmarc-fo        = "fo" *WSP "=" *WSP
  *                   ( "0" / "1" / "d" / "s" )
  *                   *(*WSP ":" *WSP ( "0" / "1" / "d" / "s" ))
  */
@@ -247,8 +247,8 @@ DmarcRecord_parse_fo(DkimTagListObject *base, const DkimTagParseContext *context
 }   // end function: DmarcRecord_parse_fo
 
 /*
- * [draft-kucherawy-dmarc-base-04] 5.3.
- * dmarc-request   = %x70 *WSP "=" *WSP
+ * [RFC7489] 6.4.
+ * dmarc-request   = "p" *WSP "=" *WSP
  *                   ( "none" / "quarantine" / "reject" )
  */
 DkimStatus
@@ -276,14 +276,14 @@ DmarcRecord_parse_p(DkimTagListObject *base, const DkimTagParseContext *context,
 
   invalid_syntax:
     /*
-     * [draft-kucherawy-dmarc-base-04] 8.
+     * [RFC7489] 6.6.3.
      * 6.  If a retrieved policy record does not contain a valid "p" tag, or
-     *     contains an "sp" tag that is not valid, then:
+     *    contains an "sp" tag that is not valid, then:
      *
-     *     1.  if an "rua" tag is present and contains at least one
-     *         syntactically valid reporting URI, the Mail Receiver SHOULD
-     *         act as if a record containing a valid "v" tag and "p=none"
-     *         was retrieved, and continue processing;
+     *    1.  if a "rua" tag is present and contains at least one
+     *        syntactically valid reporting URI, the Mail Receiver SHOULD
+     *        act as if a record containing a valid "v" tag and "p=none"
+     *        was retrieved, and continue processing;
      */
     self->receiver_policy = DMARC_RECEIVER_POLICY_NONE;
     SETDEREF(nextp, context->value_tail);
@@ -291,8 +291,8 @@ DmarcRecord_parse_p(DkimTagListObject *base, const DkimTagParseContext *context,
 }   // end function: DmarcRecord_parse_p
 
 /*
- * [draft-kucherawy-dmarc-base-04] 5.3.
- * dmarc-srequest  = %x73 %x70 *WSP "=" *WSP
+ * [RFC7489] 6.4.
+ * dmarc-srequest  = "sp" *WSP "=" *WSP
  *                   ( "none" / "quarantine" / "reject" )
  */
 DkimStatus
@@ -325,8 +325,8 @@ DmarcRecord_parse_sp(DkimTagListObject *base, const DkimTagParseContext *context
 }   // end function: DmarcRecord_parse_sp
 
 /*
- * [draft-kucherawy-dmarc-base-04] 5.3.
- * dmarc-ainterval = %x72 %x69 *WSP "=" *WSP 1*DIGIT
+ * [RFC7489] 6.4.
+ * dmarc-ainterval = "ri" *WSP "=" *WSP 1*DIGIT
  */
 DkimStatus
 DmarcRecord_parse_ri(DkimTagListObject *base, const DkimTagParseContext *context,
@@ -346,9 +346,9 @@ DmarcRecord_parse_ri(DkimTagListObject *base, const DkimTagParseContext *context
 }   // end function: DmarcRecord_parse_ri
 
 /*
- * [draft-kucherawy-dmarc-base-04] 5.3.
- * dmarc-percent   = %x70 %x63 %x74 *WSP "=" *WSP
- *                    1*3DIGIT
+ * [RFC7489] 6.4.
+ * dmarc-percent   = "pct" *WSP "=" *WSP
+ *                   1*3DIGIT
  */
 DkimStatus
 DmarcRecord_parse_pct(DkimTagListObject *base, const DkimTagParseContext *context,
@@ -368,9 +368,9 @@ DmarcRecord_parse_pct(DkimTagListObject *base, const DkimTagParseContext *contex
 }   // end function: DmarcRecord_parse_pct
 
 /*
- * [draft-kucherawy-dmarc-base-04] 5.3.
- * dmarc-rfmt      = %x72 %x66  *WSP "=" *WSP
- *                   ( "afrf" / "iodef" )
+ * [RFC7489] 6.4.
+ * dmarc-rfmt      = "rf"  *WSP "=" *WSP Keyword *(*WSP ":" Keyword)
+ *                   ; registered reporting formats only
  */
 DkimStatus
 DmarcRecord_parse_rf(DkimTagListObject *base, const DkimTagParseContext *context,
@@ -428,8 +428,8 @@ DmarcRecord_build(const char *domain, const char *keyval, DmarcRecord **dmarc_re
     self->ftbl = dmarc_record_field_table;
 
     /*
-     * [draft-kucherawy-dmarc-base-04] 5.2.
-     * Syntax errors in the remainder of the record SHOULD be discarded in favour of
+     * [RFC7489] 6.3.
+     * Syntax errors in the remainder of the record SHOULD be discarded in favor of
      * default values (if any) or ignored outright.
      */
     DkimStatus build_stat =
@@ -462,16 +462,16 @@ static DkimStatus
 DmarcRecord_checkVersionTag(const DnsTxtResponse *txt_rr, size_t *index)
 {
     /*
-     * [draft-kucherawy-dmarc-base-04] 8.
+     * [RFC7489] 6.6.3.
      * 2.  Records that do not start with a "v=" tag that identifies the
-     *    current version of DMARC are discarded.
+     *     current version of DMARC are discarded.
      * (ditto with 4.)
-     * [draft-kucherawy-dmarc-base-04] 5.2.
+     * [RFC7489] 6.3.
      * v: Version (plain-text; REQUIRED).  Identifies the record retrieved
-     *   as a DMARC record.  It MUST have the value of "DMARC1".  The value
-     *   of this tag MUST match precisely; if it does not or it is absent,
-     *   the entire retrieved record MUST be ignored.  It MUST be the first
-     *   tag in the list.
+     *    as a DMARC record.  It MUST have the value of "DMARC1".  The value
+     *    of this tag MUST match precisely; if it does not or it is absent,
+     *    the entire retrieved record MUST be ignored.  It MUST be the first
+     *    tag in the list.
      */
     int valid_index = -1;
     for (size_t txtrr_idx = 0; txtrr_idx < txt_rr->num; ++txtrr_idx) {
@@ -512,7 +512,7 @@ DmarcRecord_query(const char *domain, DnsResolver *resolver, DmarcRecord **dmarc
     assert(NULL != resolver);
 
     /*
-     * [draft-kucherawy-dmarc-base-04] 5.
+     * [RFC7489] 6.1.
      * Domain Owner DMARC preferences are stored as DNS TXT records in
      * subdomains named "_dmarc".
      */
@@ -531,9 +531,10 @@ DmarcRecord_query(const char *domain, DnsResolver *resolver, DmarcRecord **dmarc
         DkimStatus record_stat = DmarcRecord_checkVersionTag(txt_rr, &record_index);
         if (DSTAT_OK != record_stat) {
             /*
-             * [draft-kucherawy-dmarc-base-04] 8.
+             * [RFC7489] 6.6.3.
              * 5.  If the remaining set contains multiple records or no records,
-             *     processing terminates and the Mail Receiver takes no action.
+             *     policy discovery terminates and DMARC processing is not applied
+             *     to this message.
              * (snip)
              * If the set produced by the mechanism above contains no DMARC policy
              * record (i.e., any indication that there is no such record as opposed
@@ -563,12 +564,12 @@ DmarcRecord_query(const char *domain, DnsResolver *resolver, DmarcRecord **dmarc
             return build_stat;
         } else if (DSTAT_ISPERMFAIL(build_stat)) {
             /*
-             * [draft-kucherawy-dmarc-base-04] 16.2.
+             * [RFC7489] 11.2.
              * Code:  permerror
              * (snip)
              * Meaning:  A permanent error occurred during DMARC evaluation, such as
-             *   encountering a syntactically incorrect DMARC record.  A later
-             *   attempt is unlikely to produce a final result.
+             *    encountering a syntactically incorrect DMARC record.  A later
+             *    attempt is unlikely to produce a final result.
              */
             DkimLogPermFail("invalid DMARC record: domain=%s, error=%s, record=[%s]",
                             domain, DkimStatus_getSymbol(build_stat), NNSTR(txtrecord));
@@ -590,9 +591,10 @@ DmarcRecord_query(const char *domain, DnsResolver *resolver, DmarcRecord **dmarc
         /*
          * No TXT records are found
          *
-         * [draft-kucherawy-dmarc-base-04] 8.
+         * [RFC7489] 6.6.3.
          * 5.  If the remaining set contains multiple records or no records,
-         *     processing terminates and the Mail Receiver takes no action.
+         *     policy discovery terminates and DMARC processing is not applied
+         *     to this message.
          * (snip)
          * If the set produced by the mechanism above contains no DMARC policy
          * record (i.e., any indication that there is no such record as opposed
@@ -619,7 +621,7 @@ DmarcRecord_query(const char *domain, DnsResolver *resolver, DmarcRecord **dmarc
     case DNS_STAT_RESOLVER:
     case DNS_STAT_RESOLVER_INTERNAL:
         /*
-         * [draft-kucherawy-dmarc-base-04] 8.
+         * [RFC7489] 6.6.3.
          * Handling of DNS errors when querying for the DMARC policy record is
          * left to the discretion of the Mail Receiver.
          */
@@ -645,7 +647,7 @@ DmarcRecord_query(const char *domain, DnsResolver *resolver, DmarcRecord **dmarc
 }   // end function: DmarcRecord_query
 
 /**
- * Perform the DMARC Record discovery described in draft-kucherawy-dmarc-base-04 Section 8.
+ * Perform the DMARC Record discovery described in RFC7489 Section 6.6.3.
  * @return DSTAT_OK for success, otherwise status code that indicates error.
  * @error DSTAT_INFO_DNSRR_NOT_EXIST DMARC record does not exist
  * @error DSTAT_TMPERR_DNS_ERROR_RESPONSE DNS lookup error (received error response)
@@ -667,7 +669,7 @@ DmarcRecord_discover(const char *authordomain, const PublicSuffix *public_suffix
     assert(NULL != dmarc_record);
 
     /*
-     * [draft-kucherawy-dmarc-base-04] 8.
+     * [RFC7489] 6.6.3.
      * 1.  Mail Receivers MUST query the DNS for a DMARC TXT record at the
      *     DNS domain matching the one found in the RFC5322.From domain in
      *     the message.  A possibly empty set of records is returned.
@@ -678,7 +680,7 @@ DmarcRecord_discover(const char *authordomain, const PublicSuffix *public_suffix
     DkimStatus query_stat = DmarcRecord_query(authordomain, resolver, dmarc_record);
     if (DSTAT_INFO_DNSRR_NOT_EXIST == query_stat) {
         /*
-         * [draft-kucherawy-dmarc-base-04] 8.
+         * [RFC7489] 6.6.3.
          * 3.  If the set is now empty, the Mail Receiver MUST query the DNS for
          *     a DMARC TXT record at the DNS domain matching the Organizational
          *     Domain in place of the RFC5322.From domain in the message (if

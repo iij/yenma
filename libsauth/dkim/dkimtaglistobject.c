@@ -75,8 +75,8 @@ DkimTagListObject_dispatchParser(DkimTagListObject *self, const DkimTagParseCont
             if (ignore_syntax_error && !(fieldmap->required)
                 && DSTAT_PERMFAIL_TAG_SYNTAX_VIOLATION == parse_stat) {
                 /*
-                 * [draft-kucherawy-dmarc-base-04] 5.2.
-                 * Syntax errors in the remainder of the record SHOULD be discarded in favour of
+                 * [RFC7489] 6.3.
+                 * Syntax errors in the remainder of the record SHOULD be discarded in favor of
                  * default values (if any) or ignored outright.
                  */
                 parse_stat = DSTAT_OK;
@@ -96,6 +96,9 @@ DkimTagListObject_dispatchParser(DkimTagListObject *self, const DkimTagParseCont
              *
              * [RFC5617] 4.2.1.
              * Unrecognized tags MUST be ignored.
+             *
+             * [RFC7489] 6.3.
+             * Unknown tags MUST be ignored.
              */
             *nextp = context->value_tail;
             return DSTAT_OK;

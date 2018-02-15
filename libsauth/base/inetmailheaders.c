@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -158,7 +158,7 @@ InetMailHeaders_getNonEmptyHeaderIndex(const InetMailHeaders *self, const char *
     return InetMailHeaders_getHeaderIndexImpl(self, fieldname, true, multiple);
 }   // end function: InetMailHeaders_getNonEmptyHeaderIndex
 
-static InetMailboxArray *
+InetMailboxArray *
 InetMailHeaders_parseMailboxList(const char *head, const char *tail, const char **errptr)
 {
     const char *p = NULL;
