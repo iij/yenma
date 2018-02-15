@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -403,6 +403,17 @@ DkimPublicKey_build(const DkimVerificationPolicy *policy, const char *keyval, co
             return DSTAT_PERMFAIL_PUBLICKEY_TYPE_MISMATCH;
         }   // end if
         break;
+#if defined(EVP_PKEY_ED25519)
+    case DKIM_KEY_TYPE_ED25519:
+        if (EVP_PKEY_ED25519 != EVP_PKEY_type(self->pkey->type)) {
+            DkimLogPermFail
+                ("key-k-tag and key-p-tag doesn't match: domain=%s, keyalg=0x%x, keytype=0x%x",
+                 domain, self->keytype, EVP_PKEY_type(self->pkey->type));
+            DkimPublicKey_free(self);
+            return DSTAT_PERMFAIL_PUBLICKEY_TYPE_MISMATCH;
+        }   // end if
+        break;
+#endif
     default:
         DkimLogImplError("unexpected public key algorithm: pubkeyalg=0x%x", self->keytype);
         DkimPublicKey_free(self);

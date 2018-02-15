@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2015 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -29,6 +29,7 @@ typedef enum DkimC14nAlgorithm {
 typedef enum DkimKeyType {
     DKIM_KEY_TYPE_NULL = 0,
     DKIM_KEY_TYPE_RSA,
+    DKIM_KEY_TYPE_ED25519,
     DKIM_KEY_TYPE_ANY = 0xffffffff,
 } DkimKeyType;
 

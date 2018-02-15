@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2014 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -200,6 +200,11 @@ DkimDigester_new(DkimHashAlgorithm digest_alg,
     case DKIM_KEY_TYPE_RSA:
         self->pubkey_alg = EVP_PKEY_RSA;
         break;
+#if defined(EVP_PKEY_ED25519)
+    case DKIM_KEY_TYPE_ED25519:
+        self->pubkey_alg = EVP_PKEY_ED25519;
+        break;
+#endif
     default:
         DkimLogPermFail("unsupported public key algorithm specified: pubkeyalg=0x%x", pubkey_alg);
         DkimDigester_free(self);

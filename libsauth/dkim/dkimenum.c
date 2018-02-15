@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2013 Internet Initiative Japan Inc. All rights reserved.
+ * Copyright (c) 2006-2018 Internet Initiative Japan Inc. All rights reserved.
  *
  * The terms and conditions of the accompanying program
  * shall be provided separately by Internet Initiative Japan Inc.
@@ -36,6 +36,9 @@ static const KeywordMap dkim_c14n_algorithm_table[] = {
 
 static const KeywordMap dkim_key_type_table[] = {
     {"rsa", DKIM_KEY_TYPE_RSA},
+    // [draft-ietf-dcrup-dkim-crypto-08] 4.1.
+    // sig-a-tag-k =/ "ed25519"
+    {"ed25519", DKIM_KEY_TYPE_ED25519},
     {NULL, DKIM_KEY_TYPE_NULL},
 };
 

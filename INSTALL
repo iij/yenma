@@ -1,10 +1,10 @@
 
-               Installing ENMA
+               Installing YENMA
 
 * Supported OSes
   - Linux
   - FreeBSD, NetBSD
-  - MacOS X 10.5.x 
+  - MacOS X 10.5.x
   - Solaris 10 or later
 
 * Necessary softwares
@@ -21,8 +21,8 @@
 
   1. Extracting
 
-    $ tar xzf enma-x.y.z.tar.gz
-    $ cd enma-x.y.z
+    $ tar xzf yenma-x.y.z.tar.gz
+    $ cd yenma-x.y.z
 
   2. Installing dependent libraries
 
@@ -56,48 +56,48 @@
 
   6. Preparing the configuration file
 
-    $ sudo cp enma/etc/enma.conf.sample /etc/enma.conf
+    $ sudo cp yenma/etc/yenma.conf.sample /etc/yenma.conf
 
   7. Creating the directory for the PID file
 
-    In the sample configuration file, "/var/run/enma/enma.pid" is
+    In the sample configuration file, "/var/run/yenma/yenma.pid" is
     specified to "milter.pidfile". So, you need to change permission
     of the directory so that "milter.user" can write.
 
-    $ sudo mkdir -p /var/run/enma
-    $ sudo chown daemon:daemon /var/run/enma
-    $ sudo chmod 700 /var/run/enma
+    $ sudo mkdir -p /var/run/yenma
+    $ sudo chown daemon:daemon /var/run/yenma
+    $ sudo chmod 700 /var/run/yenma
 
   8. Executing
 
-    $ sudo /usr/local/libexec/enma -c /etc/enma.conf
-  
+    $ sudo /usr/local/libexec/yenma -c /etc/yenma.conf
+
 * Configuring MTA
 
-  Configure MTA so as to use ENMA when it receives messages.
+  Configure MTA so as to use YENMA when it receives messages.
 
   - sendmail
 
-    Specify ENMA's milter socket with the MAIL_FILTER or
+    Specify YENMA's milter socket with the MAIL_FILTER or
     INPUT_MAIL_FILTER macro in the .mc file, then generate
     sendmail.cf.
 
-    Example of using ENMA's default socket:
+    Example of using YENMA's default socket:
 
-        INPUT_MAIL_FILTER(`enma', `S=inet:10025@127.0.0.1')dnl
+        INPUT_MAIL_FILTER(`yenma', `S=inet:10025@127.0.0.1')dnl
 
     For more information on INPUT_MAIL_FILTER, please refer to
     cf/README etc in the sendmail package.
 
-    If you use sendmail 8.13 or earlier as MTA, set 
-    "milter.sendmail813" to "ture" in ENMA's configuration file.
+    If you use sendmail 8.13 or earlier as MTA, set
+    "milter.sendmail813" to "ture" in YENMA's configuration file.
 
   - postfix (2.4 or later)
 
-    Set "milter.postfix" to "true" in ENMA's configuration file.
-    Specify smtpd_milters to ENMA's milter socket in the main.cf file.
+    Set "milter.postfix" to "true" in YENMA's configuration file.
+    Specify smtpd_milters to YENMA's milter socket in the main.cf file.
 
-    Example of using ENMA's default socket:
+    Example of using YENMA's default socket:
 
         smtpd_milters = inet:127.0.0.1:10025
 
@@ -153,11 +153,11 @@
   For more information about installation of OpenSSL, ldns and
   libmiter, please refer to manuals in each packages.
 
-* Notes on building ENMA for the many user environments
+* Notes on building YENMA for the many user environments
 
   - Specifying SM_CONF_POLL for libmilter
 
-    If select() is used for the communication with sendmail, 
+    If select() is used for the communication with sendmail,
     file descriptors over FD_SETSIZE cannot be handled. So, poll()
     should be used instead. Please define SM_CONF_POLL when building
     libmilter.
@@ -167,14 +167,14 @@
       # Setting to add to site.config.m4
       APPENDDEF(`confENVDEF', `-DSM_CONF_POLL=1')
 
-    If you install ENMA with "build/build_all.sh", SM_CONF_POLL is
+    If you install YENMA with "build/build_all.sh", SM_CONF_POLL is
     automatically specified.
 
   - Specifying the "-m64" option of gcc on SPARC Solaris
 
     32bit version fopen() of Solaris, used in libbind, cannot handle
     file descriptors over 255. So, please specify the "-64bit" option
-    when building the libraries and ENMA.
+    when building the libraries and YENMA.
 
     - libbind
 
@@ -188,7 +188,7 @@
       APPENDDEF(`confENVDEF', `-DSM_CONF_POLL=1')
       APPENDDEF(`confCCOPTS', `-m64')
 
-    - ENMA
+    - YENMA
 
       $ ./configure CFLAGS=-m64 LDFLAGS=-m64
 
