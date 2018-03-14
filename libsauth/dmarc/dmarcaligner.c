@@ -120,12 +120,10 @@ DmarcAligner_checkStrictly(DmarcAligner *self, const char *domain)
 static DkimStatus
 DmarcAligner_checkRelaxedly(DmarcAligner *self, const char *domain)
 {
-    if (DMARC_ALIGN_MODE_RELAXED == DmarcRecord_getDkimAlignmentMode(self->record)) {
-        const char *orgl_domain = PublicSuffix_getOrganizationalDomain(self->publicsuffix, domain);
-        if (NULL != orgl_domain && InetDomain_equals(orgl_domain, self->orgl_authordomain)) {
-            self->score = DMARC_SCORE_PASS;
-            return DSTAT_INFO_FINISHED;
-        }   // end if
+    const char *orgl_domain = PublicSuffix_getOrganizationalDomain(self->publicsuffix, domain);
+    if (NULL != orgl_domain && InetDomain_equals(orgl_domain, self->orgl_authordomain)) {
+        self->score = DMARC_SCORE_PASS;
+        return DSTAT_INFO_FINISHED;
     }   // end if
 
     return DSTAT_OK;
@@ -150,8 +148,10 @@ DmarcAligner_checkDkimAlignment(DmarcAligner *self, bool strict_mode)
         if (DKIM_BASE_SCORE_PASS != result->score || result->testing) {
             continue;
         }   // end if
-        DkimStatus dstat = strict_mode ? DmarcAligner_checkStrictly(self, result->sdid)
-            : DmarcAligner_checkRelaxedly(self, result->sdid);
+        DkimStatus dstat =
+                (strict_mode || DMARC_ALIGN_MODE_RELAXED != DmarcRecord_getDkimAlignmentMode(self->record))
+                ? DmarcAligner_checkStrictly(self, result->sdid)
+                : DmarcAligner_checkRelaxedly(self, result->sdid);
         if (DSTAT_OK != dstat) {
             return dstat;
         }   // end if
@@ -172,8 +172,9 @@ DmarcAligner_checkSpfAlignment(DmarcAligner *self, bool strict_mode)
     }   // end if
 
     const char *spf_auth_domain = SpfEvaluator_getEvaluatedDomain(self->evaluator);
-    return strict_mode ? DmarcAligner_checkStrictly(self, spf_auth_domain)
-        : DmarcAligner_checkRelaxedly(self, spf_auth_domain);
+    return (strict_mode || DMARC_ALIGN_MODE_RELAXED != DmarcRecord_getSpfAlignmentMode(self->record))
+           ? DmarcAligner_checkStrictly(self, spf_auth_domain)
+           : DmarcAligner_checkRelaxedly(self, spf_auth_domain);
 }   // end function: DmarcAligner_checkSpfAlignment
 
 static DkimStatus
