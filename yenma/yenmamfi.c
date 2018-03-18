@@ -588,7 +588,7 @@ yenma_dmarcv_eom(YenmaSession *session)
             const InetMailbox *author = InetMailboxArray_get(authors, j);
             DmarcAligner *aligner = NULL;
             DkimStatus dmarc_stat =
-                DmarcAligner_new(session->ctx->public_suffix, session->resolver, &aligner);
+                DmarcAligner_new(session->ctx->public_suffix, session->resolver, session->ctx->cfg->vdmarc_verification, &aligner);
             if (DSTAT_OK != dmarc_stat) {
                 LogNoResource();
                 return false;
