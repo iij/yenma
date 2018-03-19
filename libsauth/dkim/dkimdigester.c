@@ -28,6 +28,7 @@
 #include "dkimlogger.h"
 #include "xbuffer.h"
 #include "strpairlist.h"
+#include "openssl-evp-compat.h"
 #include "dkimsignature.h"
 #include "dkimcanonicalizer.h"
 #include "dkimdigester.h"
@@ -35,8 +36,8 @@
 struct DkimDigester {
     const EVP_MD *digest_alg;
     int pubkey_alg;
-    EVP_MD_CTX header_digest;
-    EVP_MD_CTX body_digest;
+    EVP_MD_CTX *header_digest;
+    EVP_MD_CTX *body_digest;
     DkimCanonicalizer *canon;
     bool keep_leading_header_space;
     /// body length limit. sig-l-tag itself. -1 for unlimited.
@@ -216,13 +217,13 @@ DkimDigester_new(DkimHashAlgorithm digest_alg,
         DkimDigester_free(self);
         return canon_stat;
     }   // end if
-    if (0 == EVP_DigestInit(&(self->header_digest), self->digest_alg)) {
+    if (!(self->header_digest = EVP_MD_CTX_new()) || 0 == EVP_DigestInit(self->header_digest, self->digest_alg)) {
         DkimLogSysError("Digest Initialization (of header) failed");
         DkimDigester_logOpenSSLErrors();
         DkimDigester_free(self);
         return DSTAT_SYSERR_NORESOURCE;
     }   // end if
-    if (0 == EVP_DigestInit(&(self->body_digest), self->digest_alg)) {
+    if (!(self->body_digest = EVP_MD_CTX_new()) || 0 == EVP_DigestInit(self->body_digest, self->digest_alg)) {
         DkimLogSysError("Digest Initialization (of body) failed");
         DkimDigester_logOpenSSLErrors();
         DkimDigester_free(self);
@@ -249,8 +250,13 @@ DkimDigester_free(DkimDigester *self)
 
     (void) DkimDigester_closeC14nDump(self);
     DkimCanonicalizer_free(self->canon);
-    (void) EVP_MD_CTX_cleanup(&(self->header_digest));
-    (void) EVP_MD_CTX_cleanup(&(self->body_digest));
+
+    if (self->header_digest) {
+        EVP_MD_CTX_free(self->header_digest);
+    }
+    if (self->body_digest) {
+        EVP_MD_CTX_free(self->body_digest);
+    }
 
     // No need to clean up "self->digest_alg"
 
@@ -292,7 +298,7 @@ DkimDigester_updateBodyChunk(DkimDigester *self, const unsigned char *buf, size_
     }   // end if
 
     if (0 < srclen) {
-        if (0 == EVP_DigestUpdate(&self->body_digest, buf, srclen)) {
+        if (0 == EVP_DigestUpdate(self->body_digest, buf, srclen)) {
             DkimLogSysError("Digest update (of body) failed");
             DkimDigester_logOpenSSLErrors();
             return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
@@ -363,7 +369,7 @@ DkimDigester_updateHeader(DkimDigester *self, const char *headerf, const char *h
     // discard errors occurred in functions for debugging
     (void) DkimDigester_dumpCanonicalizedHeader(self, canonbuf, canonsize);
 
-    if (0 == EVP_DigestUpdate(&self->header_digest, canonbuf, canonsize)) {
+    if (0 == EVP_DigestUpdate(self->header_digest, canonbuf, canonsize)) {
         DkimLogSysError("Digest update (of header) failed");
         DkimDigester_logOpenSSLErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
@@ -490,7 +496,7 @@ DkimDigester_updateSignatureHeader(DkimDigester *self, const DkimSignature *sign
     (void) DkimDigester_dumpCanonicalizedHeader(self, canonbuf, canonsize);
 
     // update digest
-    if (0 == EVP_DigestUpdate(&self->header_digest, canonbuf, canonsize)) {
+    if (0 == EVP_DigestUpdate(self->header_digest, canonbuf, canonsize)) {
         DkimLogSysError("Digest update (of signature header) failed");
         DkimDigester_logOpenSSLErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
@@ -527,9 +533,9 @@ DkimDigester_verifyMessage(DkimDigester *self, const InetMailHeaders *headers,
 
     // check if the type of the public key is suitable for the algorithm
     // specified by sig-a-tag of the DKIM-Signature header.
-    if (publickey->type != self->pubkey_alg) {
+    if (EVP_PKEY_id(publickey) != self->pubkey_alg) {
         DkimLogPermFail("Public key algorithm mismatch: signature=0x%x, pubkey=0x%x",
-                        publickey->type, self->pubkey_alg);
+                        EVP_PKEY_id(publickey), self->pubkey_alg);
         return DSTAT_PERMFAIL_PUBLICKEY_TYPE_MISMATCH;
     }   // end if
 
@@ -544,7 +550,7 @@ DkimDigester_verifyMessage(DkimDigester *self, const InetMailHeaders *headers,
     if (DSTAT_OK != ret) {
         return ret;
     }   // end if
-    if (0 == EVP_DigestFinal(&self->body_digest, md, &mdlen)) {
+    if (0 == EVP_DigestFinal(self->body_digest, md, &mdlen)) {
         DkimLogSysError("Digest finish (of body) failed");
         DkimDigester_logOpenSSLErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
@@ -576,7 +582,7 @@ DkimDigester_verifyMessage(DkimDigester *self, const InetMailHeaders *headers,
     const XBuffer *headerhash = DkimSignature_getSignatureValue(signature);
     signbuf = (const unsigned char *) XBuffer_getBytes(headerhash);
     signlen = XBuffer_getSize(headerhash);
-    int vret = EVP_VerifyFinal(&self->header_digest, signbuf, signlen, publickey);
+    int vret = EVP_VerifyFinal(self->header_digest, signbuf, signlen, publickey);
     // EVP_VerifyFinal() returns 1 for a correct signature, 0 for failure and -1 if some other error occurred.
     switch (vret) {
     case 1:    // the signature is correct
@@ -617,9 +623,9 @@ DkimDigester_signMessage(DkimDigester *self, const InetMailHeaders *headers,
     assert(NULL != privatekey);
 
     // XXX signature と self の署名/ダイジェストアルゴリズムが一致しているか確認した方がいい
-    if (privatekey->type != self->pubkey_alg) {
+    if (EVP_PKEY_id(privatekey) != self->pubkey_alg) {
         DkimLogPermFail("Public key algorithm mismatch: signature=0x%x, privatekey=0x%x",
-                        privatekey->type, self->pubkey_alg);
+                        EVP_PKEY_id(privatekey), self->pubkey_alg);
         return DSTAT_PERMFAIL_PUBLICKEY_TYPE_MISMATCH;
     }   // end if
 
@@ -638,7 +644,7 @@ DkimDigester_signMessage(DkimDigester *self, const InetMailHeaders *headers,
     unsigned char bodyhashbuf[EVP_MD_size(self->digest_alg)];   // EVP_MAX_MD_SIZE instead of EVP_MD_size() is safer(?)
     unsigned int bodyhashlen;
     bodyhashlen = EVP_MD_size(self->digest_alg);
-    if (0 == EVP_DigestFinal(&self->body_digest, bodyhashbuf, &bodyhashlen)) {
+    if (0 == EVP_DigestFinal(self->body_digest, bodyhashbuf, &bodyhashlen)) {
         DkimLogSysError("DigestFinal (of body) failed");
         DkimDigester_logOpenSSLErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
@@ -678,7 +684,7 @@ DkimDigester_signMessage(DkimDigester *self, const InetMailHeaders *headers,
 
     unsigned char signbuf[EVP_PKEY_size(privatekey)];
     unsigned int signlen;
-    if (0 == EVP_SignFinal(&self->header_digest, signbuf, &signlen, privatekey)) {
+    if (0 == EVP_SignFinal(self->header_digest, signbuf, &signlen, privatekey)) {
         DkimLogSysError("SignFinal (of body) failed");
         DkimDigester_logOpenSSLErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
