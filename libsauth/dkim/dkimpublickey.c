@@ -36,6 +36,7 @@
 #include "intarray.h"
 #include "inetdomain.h"
 #include "inetmailbox.h"
+#include "openssl-evp-compat.h"
 #include "dnsresolv.h"
 #include "dkim.h"
 #include "dkimspec.h"
@@ -395,20 +396,20 @@ DkimPublicKey_build(const DkimVerificationPolicy *policy, const char *keyval, co
     // compare key type key-k-tag declared and stored in key-p-tag
     switch (self->keytype) {
     case DKIM_KEY_TYPE_RSA:
-        if (EVP_PKEY_RSA != EVP_PKEY_type(self->pkey->type)) {
+        if (EVP_PKEY_RSA != EVP_PKEY_base_id(self->pkey)) {
             DkimLogPermFail
                 ("key-k-tag and key-p-tag doesn't match: domain=%s, keyalg=0x%x, keytype=0x%x",
-                 domain, self->keytype, EVP_PKEY_type(self->pkey->type));
+                 domain, self->keytype, EVP_PKEY_base_id(self->pkey));
             DkimPublicKey_free(self);
             return DSTAT_PERMFAIL_PUBLICKEY_TYPE_MISMATCH;
         }   // end if
         break;
 #if defined(EVP_PKEY_ED25519)
     case DKIM_KEY_TYPE_ED25519:
-        if (EVP_PKEY_ED25519 != EVP_PKEY_type(self->pkey->type)) {
+        if (EVP_PKEY_ED25519 != EVP_PKEY_base_id(self->pkey) {
             DkimLogPermFail
                 ("key-k-tag and key-p-tag doesn't match: domain=%s, keyalg=0x%x, keytype=0x%x",
-                 domain, self->keytype, EVP_PKEY_type(self->pkey->type));
+                 domain, self->keytype, EVP_PKEY_base_id(self->pkey));
             DkimPublicKey_free(self);
             return DSTAT_PERMFAIL_PUBLICKEY_TYPE_MISMATCH;
         }   // end if
@@ -850,7 +851,7 @@ DkimPublicKey_lookup(const DkimVerificationPolicy *policy, const DkimSignature *
     DkimStatus lookup_dstat = DkimPublicKey_lookupImpl(policy, signature, resolver, publickey);
     if (DSTAT_OK == lookup_dstat) {
         // check the key length
-        switch (EVP_PKEY_type((*publickey)->pkey->type)) {
+        switch (EVP_PKEY_base_id((*publickey)->pkey)) {
         case EVP_PKEY_RSA:
             if ((int) policy->min_rsa_key_length > EVP_PKEY_bits((*publickey)->pkey)) {
                 DkimLogPermFail
