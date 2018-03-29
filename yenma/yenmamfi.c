@@ -32,6 +32,7 @@
 #include <openssl/err.h>
 #include <libmilter/mfapi.h>
 
+#include "openssl_compat.h"
 #include "ptrop.h"
 #include "stdaux.h"
 #include "loghandler.h"
