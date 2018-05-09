@@ -591,17 +591,20 @@ yenma_dmarcv_eom(YenmaSession *session)
             DkimStatus dmarc_stat =
                 DmarcAligner_new(session->ctx->public_suffix, session->resolver, &aligner);
             if (DSTAT_OK != dmarc_stat) {
+                InetMailboxArray_free(authors);
                 LogNoResource();
                 return false;
             }   // end if
             if (0 > PtrArray_append(session->aligners, aligner)) {
                 DmarcAligner_free(aligner);
+                InetMailboxArray_free(authors);
                 LogNoResource();
                 return false;
             }   // end if
             DmarcScore score =
                 DmarcAligner_check(aligner, author, session->verifier, session->spfevaluator);
             if (DMARC_SCORE_NULL == score) {
+                InetMailboxArray_free(authors);
                 LogWarning("DmarcAligner_check failed");
                 return false;
             }   // end if
@@ -620,6 +623,7 @@ yenma_dmarcv_eom(YenmaSession *session)
                 author_found = true;
             }   // end if
         }   // end for
+        InetMailboxArray_free(authors);
     }   // end for
 
     if (!author_found) {
