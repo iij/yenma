@@ -406,7 +406,7 @@ DkimPublicKey_build(const DkimVerificationPolicy *policy, const char *keyval, co
         break;
 #if defined(EVP_PKEY_ED25519)
     case DKIM_KEY_TYPE_ED25519:
-        if (EVP_PKEY_ED25519 != EVP_PKEY_base_id(self->pkey) {
+        if (EVP_PKEY_ED25519 != EVP_PKEY_base_id(self->pkey)) {
             DkimLogPermFail
                 ("key-k-tag and key-p-tag doesn't match: domain=%s, keyalg=0x%x, keytype=0x%x",
                  domain, self->keytype, EVP_PKEY_base_id(self->pkey));

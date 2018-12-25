@@ -611,12 +611,11 @@ yenma_dmarcv_eom(YenmaSession *session)
             const char *score_symbol = DmarcEnum_lookupScoreByValue(score);
             (void) AuthResult_appendMethodSpec(session->authresult, AUTHRES_METHOD_DMARC,
                                                score_symbol);
-            (void) AuthResult_appendPropSpecWithAddrSpec(session->authresult, AUTHRES_PTYPE_HEADER,
-                                                         AUTHRES_PROPERTY_FROM, author);
+            (void) AuthResult_appendPropSpecWithToken(session->authresult, AUTHRES_PTYPE_HEADER,
+                                                      AUTHRES_PROPERTY_FROM, InetMailbox_getDomain(author));
             LogEvent("DMARC",
                      AUTHRES_METHOD_DMARC "=%s, " AUTHRES_PTYPE_HEADER "." AUTHRES_PROPERTY_FROM
-                     "=%s@%s", score_symbol, InetMailbox_getLocalPart(author),
-                     InetMailbox_getDomain(author));
+                     "=%s", score_symbol, InetMailbox_getDomain(author));
 
             if (!author_found) {
                 session->validated_result->dmarc_score = score;
