@@ -85,7 +85,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-CC = $(PTHREAD_CC)
+CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
@@ -203,11 +203,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = -std=gnu99 -Wall -Wextra $(PTHREAD_CFLAGS)
+AM_CFLAGS = -std=gnu99 -Wall -Wextra
 AM_CPPFLAGS = -D_POSIX_PTHREAD_SEMANTICS \
 	-I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common \
 	../include -I../base
-AM_LDFLAGS = $(PTHREAD_LIBS)
 noinst_LTLIBRARIES = libsauth_dkim.la
 libsauth_dkim_la_SOURCES = dkimadsp.c dkimatps.c dkimcanonicalizer.c dkimconverter.c dkimdigester.c \
 	dkimenum.c dkimpublickey.c dkimsignature.c dkimsigner.c dkimsignpolicy.c \

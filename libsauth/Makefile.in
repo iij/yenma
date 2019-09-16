@@ -145,7 +145,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-CC = $(PTHREAD_CC)
+CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
@@ -265,10 +265,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = base resolver spf dkim dmarc
 noinst_HEADERS = include
-AM_CFLAGS = -std=gnu99 -Wall -Wextra $(PTHREAD_CFLAGS)
+AM_CFLAGS = -std=gnu99 -Wall -Wextra
 AM_CPPFLAGS = -D_POSIX_PTHREAD_SEMANTICS \
 	-I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common
-AM_LDFLAGS = $(PTHREAD_LIBS)
 LIBSAUTH_VERSIONINFO = 0:0:0
 lib_LTLIBRARIES = libsauth.la
 libsauth_la_SOURCES = 

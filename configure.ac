@@ -54,6 +54,9 @@ AC_CHECK_TYPES([ptrdiff_t])
 AC_CHECK_FUNCS([prctl])
 
 ACX_PTHREAD([], AC_MSG_ERROR(POSIX thread not found))
+LIBS="$PTHREAD_LIBS $LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+CC="$PTHREAD_CC"
 
 AC_ARG_WITH(libmilter,
     AS_HELP_STRING([--with-libmilter=DIR],[specify libmilter base directory]),

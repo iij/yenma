@@ -82,7 +82,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-CC = $(PTHREAD_CC)
+CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
@@ -200,11 +200,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = -std=gnu99 -Wall -Wextra $(PTHREAD_CFLAGS)
+AM_CFLAGS = -std=gnu99 -Wall -Wextra
 AM_CPPFLAGS = -D_POSIX_PTHREAD_SEMANTICS \
 	-I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common \
 	-I../include -I../base -I../dkim
-AM_LDFLAGS = $(PTHREAD_LIBS)
 noinst_LTLIBRARIES = libsauth_dmarc.la
 libsauth_dmarc_la_SOURCES = dmarcaligner.c dmarcenum.c dmarcrecord.c publicsuffix.c radtree.c \
 	dmarcenum.h dmarcrecord.h dmarcspec.h radtree.h

@@ -84,7 +84,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-CC = $(PTHREAD_CC)
+CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
@@ -202,11 +202,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = -std=gnu99 -Wall -Wextra $(PTHREAD_CFLAGS)
+AM_CFLAGS = -std=gnu99 -Wall -Wextra
 AM_CPPFLAGS = -D_POSIX_PTHREAD_SEMANTICS \
 	-I$(top_srcdir)/libsauth/include -I$(top_srcdir)/common \
 	-I$(top_srcdir)/libsauth/include
-AM_LDFLAGS = $(PTHREAD_LIBS)
 noinst_LTLIBRARIES = libsauth_base.la
 libsauth_base_la_SOURCES = bitmemcmp.c foldstring.c inet_ppton.c inetdomain.c inetmailbox.c \
 	inetmailheaders.c intarray.c keywordmap.c loghandler.c pstring.c ptrarray.c strarray.c \
