@@ -1,5 +1,5 @@
                             README of YENMA
-                            2014年 xx月xx日
+                            2017年 xx月xx日
 
 * YENMA
 
@@ -22,6 +22,7 @@
   - RFC7001 (Authentication-Results Header Field)
   - RFC7208 (Sender Policy Framework)
   - draft-kucherawy-dmarc-base-04 (DMARC)
+  - draft-akagiri-dmarc-virtual-verification-02 (Virtual DMARC)
 
   YENMA は、IIJ が開発しました。IIJ は、業務として種々の送信ドメイン認証
   ソフトウェアを利用してきましたが、どれも不安定でした。YENMA は、大手
@@ -66,13 +67,19 @@
     検査機能を利用するには Public Suffix リストを設定項目 Dmarc.PublicSuffixList
     で指定する必要があります。
 
+  - Virtual DMARC 検査
+
+    DMARC 検査の処理の際に DMARC ポリシーが DNS に存在しなかった場合、
+    デフォルトのポリシーに基づき検査を行い、検査結果を
+    Authentication-Results: フィールドに付与します。
+
   - Authentication-Results: フィールドの挿入/削除
 
-    SPF, Sender ID, DKIM, DKIM ADSP, DMARC の認証結果を Authentication-Results:
-    フィールドに記録します。また、外部から偽の Authentication-Results:
-    フィールドを挿入されるのを防ぐため、設定項目 AuthResult.ServId
-    で指定したホスト名を含んだ Authentication-Results: フィールドを削除
-    します。
+    SPF, Sender ID, DKIM, DKIM ADSP, DMARC, virtual DMARC の認証結果を
+    Authentication-Results:フィールドに記録します。また、外部から偽の
+    Authentication-Results:フィールドを挿入されるのを防ぐため、設定項
+    目 AuthResult.ServId で指定したホスト名を含んだ
+    Authentication-Results: フィールドを削除します。
 
 ** 制御コマンド
   設定項目 "Service.ControlSocket" を指定すると、そのソケットを通じて
@@ -102,6 +109,7 @@
   - "QUIT"
     制御用コマンドのセッションを終了する。
 
+* 設定項目
 設定項目の詳細については、example/yenma-ja.conf を参照してください。
 
 * 連絡先

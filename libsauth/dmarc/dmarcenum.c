@@ -24,6 +24,7 @@
 static const KeywordMap dmarc_score_table[] = {
     {"none", DMARC_SCORE_NONE},
     {"pass", DMARC_SCORE_PASS},
+    {"bestguesspass", DMARC_SCORE_BESTGUESSPASS},
     {"fail", DMARC_SCORE_FAIL},
     {"policy", DMARC_SCORE_POLICY},
     {"temperror", DMARC_SCORE_TEMPERROR},

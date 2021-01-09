@@ -27,6 +27,9 @@
 #include "dmarc.h"
 #include "dmarcrecord.h"
 
+#define DMARC_DEFAULT_BESTGUESSPASS_RECORD_WITH_STRICT_MODE "v=DMARC1; adkim=s; aspf=s; p=none"
+#define DMARC_DEFAULT_BESTGUESSPASS_RECORD_WITH_RELAXED_MODE "v=DMARC1; adkim=r; aspf=r; p=none"
+
 struct DmarcAligner {
     const char *authordomain;
     const char *orgl_authordomain;
@@ -39,6 +42,9 @@ struct DmarcAligner {
 
     DmarcRecord *record;
     DkimStatus record_stat;
+
+    VdmarcVerificationMode vdmarc_verification_mode;
+    bool verified_virtually;
 };
 
 static DmarcReceiverPolicy
@@ -68,6 +74,23 @@ DmarcAligner_retrieveRecord(DmarcAligner *self)
         self->record_stat = DSTAT_INFO_FINISHED;
         return DSTAT_OK;
     case DSTAT_INFO_DNSRR_NOT_EXIST:
+        if (self->vdmarc_verification_mode == VDMARC_VERIFICATION_MODE_STRICT ||
+            self->vdmarc_verification_mode == VDMARC_VERIFICATION_MODE_RELAX) {
+            // When no DMARC records exist for the domain
+            // and virtual DMARC is enabled,
+            // we verify the domain with a virtual dmarc record.
+            self->verified_virtually = true;
+            self->record_stat = DSTAT_INFO_FINISHED;
+            DkimStatus build_stat = DmarcRecord_build(
+                self->authordomain,
+                self->vdmarc_verification_mode == VDMARC_VERIFICATION_MODE_STRICT ?
+                      DMARC_DEFAULT_BESTGUESSPASS_RECORD_WITH_STRICT_MODE
+                    : DMARC_DEFAULT_BESTGUESSPASS_RECORD_WITH_RELAXED_MODE,
+                &self->record
+            );
+
+            return build_stat;
+        }
         /*
          * [RFC7489] 11.2.
          * Code:  none
@@ -122,7 +145,7 @@ DmarcAligner_checkRelaxedly(DmarcAligner *self, const char *domain)
 {
     const char *orgl_domain = PublicSuffix_getOrganizationalDomain(self->publicsuffix, domain);
     if (NULL != orgl_domain && InetDomain_equals(orgl_domain, self->orgl_authordomain)) {
-        self->score = DMARC_SCORE_PASS;
+        self->score = self->verified_virtually ? DMARC_SCORE_BESTGUESSPASS : DMARC_SCORE_PASS;
         return DSTAT_INFO_FINISHED;
     }   // end if
 
@@ -199,6 +222,8 @@ DmarcAligner_check(DmarcAligner *self, const InetMailbox *author,
     self->evaluator = spfevaluator;
     self->record = NULL;
     self->record_stat = DSTAT_OK;
+    // Virtual DMARC process setting. (default:false)
+    self->verified_virtually = false;
 
     DkimStatus record_stat = DmarcAligner_retrieveRecord(self);
     if (DSTAT_OK != record_stat) {
@@ -218,6 +243,12 @@ DmarcAligner_check(DmarcAligner *self, const InetMailbox *author,
             return self->score;
         }   // end if
     }   // end if
+
+    if (self->verified_virtually) {
+        // If DKIM and SPF authentication do not pass, score is set to NONE
+        self->score = DMARC_SCORE_NONE;
+        return self->score;
+    }
 
     /*
      * [RFC7489] 11.2.
@@ -249,6 +280,7 @@ DmarcAligner_getReceiverPolicy(DmarcAligner *self, bool apply_sampling_rate)
     case DMARC_SCORE_NULL: // DMARC evaluation is turned off.
     case DMARC_SCORE_NONE:
     case DMARC_SCORE_PASS:
+    case DMARC_SCORE_BESTGUESSPASS:
     case DMARC_SCORE_TEMPERROR:    // memory allocation failure or DNS lookup failure
     case DMARC_SCORE_PERMERROR:    // DMARC record is (syntactically) broken.
         return self->policy = DMARC_RECEIVER_POLICY_NONE;
@@ -288,7 +320,7 @@ DmarcAligner_free(DmarcAligner *self)
 }   // end function: DmarcAligner_free
 
 DkimStatus
-DmarcAligner_new(const PublicSuffix *publicsuffix, DnsResolver *resolver, DmarcAligner **aligner)
+DmarcAligner_new(const PublicSuffix *publicsuffix, DnsResolver *resolver, VdmarcVerificationMode vdmarcVerificationMode,  DmarcAligner **aligner)
 {
     DmarcAligner *self = (DmarcAligner *) malloc(sizeof(DmarcAligner));
     if (NULL == self) {
@@ -300,6 +332,7 @@ DmarcAligner_new(const PublicSuffix *publicsuffix, DnsResolver *resolver, DmarcA
     self->policy = DMARC_RECEIVER_POLICY_NULL;
     self->publicsuffix = publicsuffix;
     self->resolver = resolver;
+    self->vdmarc_verification_mode = vdmarcVerificationMode;
 
     *aligner = self;
     return DSTAT_OK;

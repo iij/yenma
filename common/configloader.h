@@ -33,6 +33,7 @@ typedef enum {
     CONFIG_TYPE_TIME,           // time_t
     CONFIG_TYPE_SYSLOG_FACILITY,    // syslog facility (int)
     CONFIG_TYPE_LOG_LEVEL,      // log level (int)
+    CONFIG_TYPE_VDMARC_VERIFICATION_MODE, // vdmarc verification mode (int)
 } ConfigType;
 
 typedef struct ConfigEntry {

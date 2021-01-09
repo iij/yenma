@@ -77,6 +77,7 @@ typedef struct YenmaConfig {
     char *dkim_canon_dump_dir;
 // DMARC verification
     bool dmarc_verify;
+    int vdmarc_verification;
     char *dmarc_public_suffix_list;
     char *dmarc_reject_action;
     char *dmarc_reject_reply_code;
