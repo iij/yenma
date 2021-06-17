@@ -38,7 +38,7 @@
 
 /// テンポラリバッファのサイズ
 #define PIDNUMBUF 128
-
+#define SYSCONF_FALLBACK_PW_BUF_SIZE 1024
 #define PATH_DEVNULL "/dev/null"
 
 struct PidFile {
@@ -216,8 +216,7 @@ setuidgid_r(const char *username, const char **errstr, bool effective)
 
     long buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
     if (0 > buflen) {
-        SETDEREF(errstr, "sysconf failed");
-        return -1;
+        buflen = SYSCONF_FALLBACK_PW_BUF_SIZE;
     }   // end if
     char *buf = (char *) malloc(buflen);
     if (NULL == buf) {
