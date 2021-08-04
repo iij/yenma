@@ -101,11 +101,14 @@ ListenerThread_shutdown(ListenerThread *self)
 
         // 他のスレッドが accept() しているディスクリプタを閉じて accept() に割り込む
         int ret;
-#if defined(__sun)
-        ret = sock_close(listenfd);
-#else
+#if defined(__linux) || defined(__FreeBSD__)
         ret = sock_shutdown(listenfd, SHUT_RDWR);   // listening socket を強制的に叩き落とす
         (void) sock_close(listenfd);
+#elif defined(__sun)
+        ret = sock_close(listenfd);
+#else // Linux, FreeBSD, Solaris 以外は試していない
+#warning "shutdown process may block"
+        ret = sock_close(listenfd);
 #endif
 
         if (0 != ret) {
