@@ -243,9 +243,9 @@ SpfMacro_dupDottedIpAddr(const SpfEvaluator *evaluator)
         const unsigned char *rawaddr_tail = rawaddr + NS_IN6ADDRSZ;
         char *bufp = addrbuf6;
         for (; rawaddr < rawaddr_tail; ++rawaddr) {
-            *(bufp++) = xtoa((*(rawaddr++) & 0xf0) >> 4);
+            *(bufp++) = xtoa((*rawaddr & 0xf0) >> 4);
             *(bufp++) = '.';
-            *(bufp++) = xtoa(*(rawaddr++) & 0x0f);
+            *(bufp++) = xtoa(*rawaddr & 0x0f);
             *(bufp++) = '.';
         }   // end for
         return strpdup(addrbuf6, bufp - 1);
