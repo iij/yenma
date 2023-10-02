@@ -1,13 +1,12 @@
 
-               Installing YENMA
+               How to Install YENMA
 
 * Supported OSes
   - Linux
   - FreeBSD, NetBSD
-  - MacOS X 10.5.x
   - Solaris 10 or later
 
-* Necessary softwares
+* Necessary software programs
   - GNU C Compiler
   - GNU Make
   - OpenSSL (0.9.8 or later)
@@ -17,7 +16,7 @@
     - libbind (bind 9, libbind 6.0 or later)
   - libmilter (sendmail 8.13 or later)
 
-* Steps of building and execution
+* Steps for building and executing
 
   1. Extracting
 
@@ -26,22 +25,21 @@
 
   2. Installing dependent libraries
 
-    To install OpenSSL, ldns and libmilter, please read "Building
+    To install OpenSSL, ldns and libmilter, please refer to "Building
     dependent libraries" below.
 
   3. Executing configure
 
-    If the headers and libraries of OpenSSL, ldns and libmilter are
-    installed in the "/usr/local" directory, execute "configure"
-    without options.
+    If you want to install headers and libraries of OpenSSL, ldns and libmilter
+    to "/usr/local" directory, execute "configure" without options.
 
     $ ./configure
 
-    If they are installed in another directory, please specify the
-    base directories with the --with-ssl, --with-ldns and
-    --with-libmilter option.
+    If you want to install these libraries to other directories,
+    please specify the base directories with the --with-ssl,
+    --with-ldns and --with-libmilter options respectively.
 
-    The following example is that the base directory of OpenSSL is
+    The following example is the case that the base directory of OpenSSL is
     "/foo", that of ldns is "/bar" and that of libmilter is "/baz".
 
     $ ./configure --with-ssl=/foo --with-ldns=/bar --with-libmilter=/baz
@@ -54,15 +52,16 @@
 
     $ sudo make install
 
-  6. Preparing the configuration file
+  6. Editing the configuration file
 
-    $ sudo cp yenma/etc/yenma.conf.sample /etc/yenma.conf
+    $ sudo cp yenma/etc/yenma.conf /etc/yenma.conf
+    $ su vi /etc/yenma.conf
 
   7. Creating the directory for the PID file
 
-    In the sample configuration file, "/var/run/yenma/yenma.pid" is
-    specified to "milter.pidfile". So, you need to change permission
-    of the directory so that "milter.user" can write.
+    You need to change permission so that PID files can be created
+    in the directory specified by "Service.PidFile"
+    by the user specified by "Service.User".
 
     $ sudo mkdir -p /var/run/yenma
     $ sudo chown daemon:daemon /var/run/yenma
@@ -74,30 +73,27 @@
 
 * Configuring MTA
 
-  Configure MTA so as to use YENMA when it receives messages.
+  You should configure MTA so as to use YENMA when it receives messages.
 
   - sendmail
 
-    Specify YENMA's milter socket with the MAIL_FILTER or
-    INPUT_MAIL_FILTER macro in the .mc file, then generate
-    sendmail.cf.
+    Specify the milter socket of YENMA with MAIL_FILTER or
+    INPUT_MAIL_FILTER macro in the .mc file.
+    Then, generate sendmail.cf.
 
-    Example of using YENMA's default socket:
+    Example of using the default socket of YENMA:
 
         INPUT_MAIL_FILTER(`yenma', `S=inet:10025@127.0.0.1')dnl
 
     For more information on INPUT_MAIL_FILTER, please refer to
-    cf/README etc in the sendmail package.
-
-    If you use sendmail 8.13 or earlier as MTA, set
-    "milter.sendmail813" to "ture" in YENMA's configuration file.
+    cf/README and other documents in the sendmail package.
 
   - postfix (2.4 or later)
 
-    Set "milter.postfix" to "true" in YENMA's configuration file.
-    Specify smtpd_milters to YENMA's milter socket in the main.cf file.
+    Set "Milter.LazyQidFetch" in the configuration file of YENMA to "true".
+    Set smtpd_milters in the main.cf file to the milter socket of YENMA.
 
-    Example of using YENMA's default socket:
+    Example of using the default socket of YENMA:
 
         smtpd_milters = inet:127.0.0.1:10025
 
@@ -106,8 +102,7 @@
 
 * Building dependent libraries
 
-  This is an example to install the libraries under
-  the /usr/local directory.
+  This is an example to install the libraries to /usr/local directory.
 
   - OpenSSL
 
@@ -138,43 +133,40 @@
     $ tar zxf sendmail.x.y.z.tar.gz
     $ cd sendmail-x.y.z
 
-    - Put the followings to devtools/Site/site.config.m4
+    - Add the following settings to devtools/Site/site.config.m4
 
     define(`confINCLUDEDIR', `/usr/local/include')
     define(`confLIBDIR', `/usr/local/lib')
-    APPENDDEF(`confENVDEF', `-DSM_CONF_POLL=1 -DNETINET6=1')
-    APPENDDEF(`confOPTIMIZE', `-g')
-    # Pease add other setting appropriate to your OS.
+    APPENDDEF(`confINCDIRS', `-I/usr/local/bind/include')
+    APPENDDEF(`confLIBS', `/usr/local/lib/libbind.a')
+    # Please add other setting appropriate to your OS.
 
     $ cd libmilter
     $ ./Build
     $ sudo ./Build install
 
   For more information about installation of OpenSSL, ldns and
-  libmiter, please refer to manuals in each packages.
+  libmiter, please refer to manuals in each package.
 
-* Notes on building YENMA for the many user environments
+* Notes on building YENMA for the multiple user environments
 
   - Specifying SM_CONF_POLL for libmilter
 
     If select() is used for the communication with sendmail,
-    file descriptors over FD_SETSIZE cannot be handled. So, poll()
-    should be used instead. Please define SM_CONF_POLL when building
-    libmilter.
+    file descriptors with the size over FD_SETSIZE cannot be handled.
+    In such a case, poll() should be used instead.
+    Please define SM_CONF_POLL when building libmilter.
 
-    Please refer to "build/site.config.m4.poll-generic".
-
-      # Setting to add to site.config.m4
+      # Setting to be added to site.config.m4
       APPENDDEF(`confENVDEF', `-DSM_CONF_POLL=1')
 
-    If you install YENMA with "build/build_all.sh", SM_CONF_POLL is
-    automatically specified.
+  - Specifying "-m64" option of gcc on SPARC Solaris
 
-  - Specifying the "-m64" option of gcc on SPARC Solaris
-
-    32bit version fopen() of Solaris, used in libbind, cannot handle
-    file descriptors over 255. So, please specify the "-64bit" option
-    when building the libraries and YENMA.
+    The fopen() of 32bit version of Solaris, which is used in libbind,
+    cannot handle file descriptors over 255.
+    In such a case, please specify "-m64" option when building
+    the dependent libraries and YENMA, which enables to generate code
+    for the 64bit environment.
 
     - libbind
 
@@ -182,9 +174,7 @@
 
     - libmilter
 
-      Please refer to "build/site.config.m4.poll-m64"
-
-      # Setting to add to site.config.m4
+      # Setting to be added to site.config.m4
       APPENDDEF(`confENVDEF', `-DSM_CONF_POLL=1')
       APPENDDEF(`confCCOPTS', `-m64')
 

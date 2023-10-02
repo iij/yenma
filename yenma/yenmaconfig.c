@@ -177,6 +177,9 @@ static const ConfigEntry yenma_config_table[] = {
     {"Dmarc.Verify", CONFIG_TYPE_BOOLEAN, "true",
      offsetof(YenmaConfig, dmarc_verify), NULL},
 
+    {"Dmarc.VdmarcVerification", CONFIG_TYPE_VDMARC_VERIFICATION_MODE, "none",
+     offsetof(YenmaConfig, vdmarc_verification), NULL},
+
     {"Dmarc.PublicSuffixList", CONFIG_TYPE_STRING, NULL,
      offsetof(YenmaConfig, dmarc_public_suffix_list), NULL},
 

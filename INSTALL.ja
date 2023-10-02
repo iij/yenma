@@ -1,5 +1,5 @@
 
-			YENMA インストール手順
+            YENMA インストール手順
 
 * 対応OS
   - Linux
@@ -25,8 +25,8 @@
 
   2. 依存するライブラリのインストール
 
-  「依存するライブラリのビルド」を参考に OpenSSL、ldns および
-   libmilter をインストールしてください。
+    「依存するライブラリのビルド」を参考に OpenSSL、ldns および
+     libmilter をインストールしてください。
 
   3. configure の実行
 
@@ -55,6 +55,7 @@
 
   6. 設定ファイルの編集
 
+    $ sudo cp yenma/etc/yenma.conf /etc/yenma.conf
     $ sudo vi /etc/yenma.conf
 
   7. PID ファイル用ディレクトリの作成
@@ -71,14 +72,14 @@
   8. 起動
 
     $ sudo /usr/local/libexec/yenma -c /etc/yenma.conf
-  
+
 * MTA の設定
 
   メール受信時に YENMA を利用するように MTA を設定します。
 
   - sendmail の場合
     .mc ファイル中で MAIL_FILTER または INPUT_MAIL_FILTER マクロで
-    YENMA のmilter ソケットを指定し、sendmail.cf を生成します。
+    YENMA の milter ソケットを指定し、 sendmail.cf を生成します。
 
     例) YENMA デフォルトのソケットを利用する場合：
 
@@ -86,9 +87,6 @@
 
     INPUT_MAIL_FILTER 設定の詳細については、sendmail パッケージに含まれ
     ている cf/README 等を参照してください。
-
-    また、MTA として使用する sendmail のバージョンが 8.13 以前の場合、
-    YENMA の設定項目 "Milter.Sendmail813Compatible" を "true" に設定してください。
 
   - postfix (2.4 以降) の場合
     YENMA の設定項目 "Milter.LazyQidFetch" を "true" に設定してください。
@@ -163,7 +161,7 @@
 
   - SPARC 版 Solaris 環境では、gcc の "-m64" オプションを利用する
 
-    Solaris の 32bit 版の fopen (libbind内で使用されている) は 255 より
+    Solaris の 32bit 版の fopen (libbind 内で使用されている) は 255 より
     大きな値のファイルディスクリプタを扱えません。そこで 64bit 版のバイ
     ナリを作成する "-m64" オプションを使用し、ライブラリや YENMA を作成
     します。
