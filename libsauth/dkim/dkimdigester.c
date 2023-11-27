@@ -49,22 +49,6 @@ struct DkimDigester {
     FILE *fp_c14n_body;
 };
 
-static void
-DkimDigester_logOpenSSLErrors(void)
-{
-    unsigned long errinfo;
-    const char *errfilename, *errstr;
-    int errline, errflags;
-
-    while (0 != (errinfo = ERR_get_error_line_data(&errfilename, &errline, &errstr, &errflags))) {
-        DkimLogSysError("[OpenSSL] module=%s, function=%s, reason=%s",
-                        ERR_lib_error_string(errinfo), ERR_func_error_string(errinfo),
-                        ERR_reason_error_string(errinfo));
-        DkimLogSysError("[OpenSSL] file=%s, line=%d, error=%s", errfilename, errline,
-                        (errflags & ERR_TXT_STRING) ? errstr : "(none)");
-    }   // end while
-}   // end function: DkimDigester_logOpenSSLErrors
-
 /*
  * get ready to dump the canonicalized message
  * @return DSTAT_OK for success, otherwise status code that indicates error.
@@ -224,7 +208,7 @@ DkimDigester_new(DkimHashAlgorithm digest_alg,
     }   // end if
     if (0 == EVP_DigestInit(self->header_digest, self->digest_alg)) {
         DkimLogSysError("Digest Initialization (of header) failed");
-        DkimDigester_logOpenSSLErrors();
+        OpenSSL_logErrors();
         DkimDigester_free(self);
         return DSTAT_SYSERR_NORESOURCE;
     }   // end if
@@ -235,7 +219,7 @@ DkimDigester_new(DkimHashAlgorithm digest_alg,
     }   // end if
     if (0 == EVP_DigestInit(self->body_digest, self->digest_alg)) {
         DkimLogSysError("Digest Initialization (of body) failed");
-        DkimDigester_logOpenSSLErrors();
+        OpenSSL_logErrors();
         DkimDigester_free(self);
         return DSTAT_SYSERR_NORESOURCE;
     }   // end if
@@ -310,7 +294,7 @@ DkimDigester_updateBodyChunk(DkimDigester *self, const unsigned char *buf, size_
     if (0 < srclen) {
         if (0 == EVP_DigestUpdate(self->body_digest, buf, srclen)) {
             DkimLogSysError("Digest update (of body) failed");
-            DkimDigester_logOpenSSLErrors();
+            OpenSSL_logErrors();
             return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
         }   // end if
 
@@ -381,7 +365,7 @@ DkimDigester_updateHeader(DkimDigester *self, const char *headerf, const char *h
 
     if (0 == EVP_DigestUpdate(self->header_digest, canonbuf, canonsize)) {
         DkimLogSysError("Digest update (of header) failed");
-        DkimDigester_logOpenSSLErrors();
+        OpenSSL_logErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
     }   // end if
 
@@ -508,7 +492,7 @@ DkimDigester_updateSignatureHeader(DkimDigester *self, const DkimSignature *sign
     // update digest
     if (0 == EVP_DigestUpdate(self->header_digest, canonbuf, canonsize)) {
         DkimLogSysError("Digest update (of signature header) failed");
-        DkimDigester_logOpenSSLErrors();
+        OpenSSL_logErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
     }   // end if
 
@@ -562,7 +546,7 @@ DkimDigester_verifyMessage(DkimDigester *self, const InetMailHeaders *headers,
     }   // end if
     if (0 == EVP_DigestFinal(self->body_digest, md, &mdlen)) {
         DkimLogSysError("Digest finish (of body) failed");
-        DkimDigester_logOpenSSLErrors();
+        OpenSSL_logErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
     }   // end if
 
@@ -602,11 +586,11 @@ DkimDigester_verifyMessage(DkimDigester *self, const InetMailHeaders *headers,
         return DSTAT_PERMFAIL_SIGNATURE_DID_NOT_VERIFY;
     case -1:   // some other error occurred
         DkimLogSysError("Digest verification error");
-        DkimDigester_logOpenSSLErrors();
+        OpenSSL_logErrors();
         return DSTAT_SYSERR_DIGEST_VERIFICATION_FAILURE;
     default:
         DkimLogImplError("EVP_VerifyFinal returns unexpected value: ret=0x%x", vret);
-        DkimDigester_logOpenSSLErrors();
+        OpenSSL_logErrors();
         return DSTAT_SYSERR_IMPLERROR;
     }   // end switch
 }   // end function: DkimDigester_verifyMessage
@@ -656,7 +640,7 @@ DkimDigester_signMessage(DkimDigester *self, const InetMailHeaders *headers,
     bodyhashlen = EVP_MD_size(self->digest_alg);
     if (0 == EVP_DigestFinal(self->body_digest, bodyhashbuf, &bodyhashlen)) {
         DkimLogSysError("DigestFinal (of body) failed");
-        DkimDigester_logOpenSSLErrors();
+        OpenSSL_logErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
     }   // end if
     ret = DkimSignature_setBodyHash(signature, bodyhashbuf, bodyhashlen);
@@ -696,7 +680,7 @@ DkimDigester_signMessage(DkimDigester *self, const InetMailHeaders *headers,
     unsigned int signlen;
     if (0 == EVP_SignFinal(self->header_digest, signbuf, &signlen, privatekey)) {
         DkimLogSysError("SignFinal (of body) failed");
-        DkimDigester_logOpenSSLErrors();
+        OpenSSL_logErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
     }   // end if
     ret = DkimSignature_setSignatureValue(signature, signbuf, signlen);

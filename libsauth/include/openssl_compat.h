@@ -35,4 +35,6 @@ inline int EVP_PKEY_base_id(const EVP_PKEY *pkey) {
 
 #endif
 
+extern void OpenSSL_logErrors(void);
+
 #endif /* __OPENSSL_EVP_COMPAT_H__ */

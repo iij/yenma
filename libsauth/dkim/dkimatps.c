@@ -36,6 +36,7 @@
 #include "dkimlogger.h"
 #include "inetdomain.h"
 #include "dnsresolv.h"
+#include "openssl_compat.h"
 #include "dkim.h"
 #include "dkimspec.h"
 #include "dkimenum.h"
@@ -75,23 +76,6 @@ _strlowercpy(char *dst, const char *src, size_t buflen)
     }   // end if
     return dst;
 }   // end function: _strlowercpy
-
-static void
-DkimAtps_logOpenSSLErrors(void)
-// XXX duplicated
-{
-    unsigned long errinfo;
-    const char *errfilename, *errstr;
-    int errline, errflags;
-
-    while (0 != (errinfo = ERR_get_error_line_data(&errfilename, &errline, &errstr, &errflags))) {
-        DkimLogSysError("[OpenSSL] module=%s, function=%s, reason=%s",
-                        ERR_lib_error_string(errinfo), ERR_func_error_string(errinfo),
-                        ERR_reason_error_string(errinfo));
-        DkimLogSysError("[OpenSSL] file=%s, line=%d, error=%s", errfilename, errline,
-                        (errflags & ERR_TXT_STRING) ? errstr : "(none)");
-    }   // end while
-}   // end function: DkimAtps_logOpenSSLErrors
 
 /*
  * [RFC6541] 4.4.
@@ -365,7 +349,7 @@ DkimAtps_appendHashedSdid(const char *sdid, DkimHashAlgorithm hashalg, XBuffer *
 
     if (0 == EVP_Digest(sdid_lower, sdid_len, digestbuf, &digestbuflen, digest_alg, NULL)) {
         DkimLogSysError("EVP_Digest failed");
-        DkimAtps_logOpenSSLErrors();
+        OpenSSL_logErrors();
         return DSTAT_SYSERR_DIGEST_UPDATE_FAILURE;
     }   // end if
 
