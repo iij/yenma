@@ -53,6 +53,7 @@
 
 #define YENMA_MILTER_ACTION_FLAGS (SMFIF_ADDHDRS | SMFIF_CHGHDRS)
 
+// restore YenmaSession and set log prefix again.
 #define RESTORE_YENMASESSION(smfictx, psession) \
     do { \
         psession = (YenmaSession *) smfi_getpriv(smfictx); \
@@ -60,6 +61,7 @@
             LogError("smfi_getpriv failed"); \
             return SMFIS_TEMPFAIL; \
         } \
+        LogHandler_setPrefix((psession)->qid); \
     } while (0)
 
 static int
@@ -859,10 +861,9 @@ yenmamfi_connect(SMFICTX *ctx, char *hostname, _SOCK_ADDR *hostaddr)
 static sfsistat
 yenmamfi_helo(SMFICTX *ctx, char *helohost)
 {
-    LogDebug("%s called: helo=%s", __func__, NNSTR(helohost));
-
     YenmaSession *session = NULL;
     RESTORE_YENMASESSION(ctx, session);
+    LogDebug("%s called: helo=%s", __func__, NNSTR(helohost));
 
     // [SPF] Storing the HELO/EHLO parameter
     // HELO を1コネクション中に複数回受け付けてしまうのでその対策
@@ -883,10 +884,9 @@ yenmamfi_helo(SMFICTX *ctx, char *helohost)
 static sfsistat
 yenmamfi_envfrom(SMFICTX *ctx, char **argv)
 {
-    LogDebug("%s called: EnvFrom=%s", __func__, NNSTR(argv[0]));
-
     YenmaSession *session = NULL;
     RESTORE_YENMASESSION(ctx, session);
+    LogDebug("%s called: EnvFrom=%s", __func__, NNSTR(argv[0]));
 
     // 2回目以降のトランザクションの場合に備えて掃除
     YenmaSession_reset(session);
@@ -941,12 +941,11 @@ yenmamfi_envfrom(SMFICTX *ctx, char **argv)
 static sfsistat
 yenmamfi_header(SMFICTX *ctx, char *headerf, char *headerv)
 {
+    YenmaSession *session = NULL;
+    RESTORE_YENMASESSION(ctx, session);
 #if defined(DEBUG)
     LogDebug("%s called: headerf=%s, headerv=%s", __func__, NNSTR(headerf), NNSTR(headerv));
 #endif
-
-    YenmaSession *session = NULL;
-    RESTORE_YENMASESSION(ctx, session);
 
     if (session->ctx->cfg->milter_lazy_qid_fetch && NULL == session->qid) {
         // postfix に対応させるため, qid の取得を遅らせる
@@ -993,10 +992,9 @@ yenmamfi_header(SMFICTX *ctx, char *headerf, char *headerv)
 static sfsistat
 yenmamfi_eoh(SMFICTX *ctx)
 {
-    LogDebug("%s called", __func__);
-
     YenmaSession *session = NULL;
     RESTORE_YENMASESSION(ctx, session);
+    LogDebug("%s called", __func__);
 
     // [DKIM] DKIM 検証処理の可否の判断
     if (session->ctx->cfg->dkim_verify) {
@@ -1033,12 +1031,11 @@ yenmamfi_eoh(SMFICTX *ctx)
 static sfsistat
 yenmamfi_body(SMFICTX *ctx, unsigned char *bodyp, size_t bodylen)
 {
+    YenmaSession *session = NULL;
+    RESTORE_YENMASESSION(ctx, session);
 #if defined(DEBUG)
     LogDebug("%s called", __func__);
 #endif
-
-    YenmaSession *session = NULL;
-    RESTORE_YENMASESSION(ctx, session);
 
     if (session->ctx->cfg->dkim_verify) {
         DkimStatus body_stat = DkimVerifier_updateBody(session->verifier, bodyp, bodylen);
@@ -1059,10 +1056,9 @@ yenmamfi_body(SMFICTX *ctx, unsigned char *bodyp, size_t bodylen)
 static sfsistat
 yenmamfi_eom(SMFICTX *ctx)
 {
-    LogDebug("%s called", __func__);
-
     YenmaSession *session = NULL;
     RESTORE_YENMASESSION(ctx, session);
+    LogDebug("%s called", __func__);
 
     // delete the Authentication-Results header(s)
     size_t authhdr_num = IntArray_getCount(session->delauthhdr);
