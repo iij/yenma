@@ -475,7 +475,7 @@ DmarcRecord_checkVersionTag(const DnsTxtResponse *txt_rr, size_t *index)
      */
     int valid_index = -1;
     for (size_t txtrr_idx = 0; txtrr_idx < txt_rr->num; ++txtrr_idx) {
-        const char *txtrecord = txt_rr->data[0];
+        const char *txtrecord = txt_rr->data[txtrr_idx];
         if (0 == strncmp(txtrecord, DMARC1_RECORD_PREFIX, strlen(DMARC1_RECORD_PREFIX))) {
             if (0 <= valid_index) {
                 return DSTAT_PERMFAIL_MULTIPLE_DNSRR;
