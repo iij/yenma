@@ -1,9 +1,8 @@
-                            README of ENMA
-                           xxxxxxxx xx, 2014
+                            README of YENMA
 
-* ENMA
+* YENMA
 
-  ENMA is a milter program for the domain authentication technologies.
+  YENMA is a milter program for the domain authentication technologies.
   It authenticates sender's address with SPF, Sender ID, DKIM and DKIM
   ADSP, then labels the result onto the Authentication-Results: field.
 
@@ -21,10 +20,10 @@
   - RFC6577 (Auth-Results SPF Erratum, obsoleted by RFC7001)
   - RFC7001 (Authentication-Results Header Field)
   - RFC7208 (Sender Policy Framework)
-  - draft-kucherawy-dmarc-base-04 (DMARC)
+  - RFC7489 (DMARC)
 
-  ENMA is developed by IIJ. IIJ has been using several domain
-  authentication software, though, all of them appeared unstable. ENMA
+  YENMA is developed by IIJ. IIJ has been using several domain
+  authentication software, though, all of them appeared unstable. YENMA
   is designed and implemented in order to stand large ISP's operation
   and is well-tested.
 
@@ -32,7 +31,7 @@
 
   - SPF authentication
 
-    Enma extracts a sender domain from SMTP MAIL FROM and looks up
+    Yenma extracts a sender domain from SMTP MAIL FROM and looks up
     DNS. If "<>" is specified in SMTP MAIL FROM, it extracts a domain
     from SMTP EHLO/HELO. It records authentication result onto the
     Authentication-Results: field. The Received-SPF: field is not
@@ -40,13 +39,13 @@
 
   - Sender ID authentication
 
-    Enma extracts a sender domain from a mail header with RPA and
+    Yenma extracts a sender domain from a mail header with RPA and
     looks up DNS. It records authentication result onto the
     Authentication-Results: field.
 
   - DKIM authentication
 
-    Enma extracts a sender domain from the DKIM-Signature field and
+    Yenma extracts a sender domain from the DKIM-Signature field and
     looks up DNS. Then it checks the DKIM signature to verify
     authenticity of the sender domain and integrity of the mail body.
     It records authentication result onto the Authentication-Results:
@@ -68,17 +67,3 @@
     prevent insertion of faked Authentication-Results: fields, the
     fields which contains the hostname specified with
     authresult.identifier are deleted.
-
-* Contact info
-
-  You can download ENMA packages at the following website:
-
-    http://enma.sourceforge.net/
-
-  Please use the following mailing lists for questions and discussions
-  on ENMA:
-
-    enma-users@lists.sourceforge.net (English)
-    enma-users-jp@lists.sourceforge.net (Japanese)
-
-$Id$
