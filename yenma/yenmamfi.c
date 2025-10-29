@@ -224,8 +224,6 @@ yenma_dkimv_eom(YenmaSession *session)
             }   // end if
 
             if (NULL != result->auid) {
-                session->validated_result->dkim_eval_address = InetMailbox_duplicate(result->auid); // save AUID
-
                 (void) AuthResult_appendPropSpecWithAddrSpec(session->authresult,
                                                              AUTHRES_PTYPE_HEADER,
                                                              AUTHRES_PROPERTY_I, result->auid);

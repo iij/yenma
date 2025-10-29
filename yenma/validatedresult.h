@@ -28,7 +28,6 @@ typedef struct ValidatedResult {
         InetMailbox *envfrom;   // EnvFrom
         char *helohost;         // HELO
     } spf_eval_address;
-    InetMailbox *dkim_eval_address; // DKIM の検証に利用したアドレス
     SpfScore spf_score;
     SpfScore sidf_score;
     DkimBaseScore dkim_score;   // DKIM のスコア (DKIM は署名が複数存在する可能性があるのでとりあえず先頭のスコアを使用する)

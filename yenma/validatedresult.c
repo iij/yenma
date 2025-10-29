@@ -36,7 +36,6 @@ ValidatedResult_new(void)
     memset(self, 0, sizeof(ValidatedResult));
 
     self->spf_eval_address.envfrom = NULL;
-    self->dkim_eval_address = NULL;
     self->spf_score = SPF_SCORE_NULL;
     self->sidf_score = SPF_SCORE_NULL;
     self->dkim_score = DKIM_BASE_SCORE_NULL;
@@ -67,10 +66,6 @@ ValidatedResult_reset(ValidatedResult *self)
             self->spf_eval_address.helohost = NULL;
         }   // end if
     }   // end if
-    if (NULL != self->dkim_eval_address) {
-        InetMailbox_free(self->dkim_eval_address);
-        self->dkim_eval_address = NULL;
-    }   // end if
     self->spf_score = SPF_SCORE_NULL;
     self->sidf_score = SPF_SCORE_NULL;
     self->dkim_score = DKIM_BASE_SCORE_NULL;
@@ -99,11 +94,6 @@ ValidatedResult_free(ValidatedResult *self)
             free(self->spf_eval_address.helohost);
             self->spf_eval_address.helohost = NULL;
         }   // end if
-    }   // end if
-
-    if (NULL != self->dkim_eval_address) {
-        InetMailbox_free(self->dkim_eval_address);
-        self->dkim_eval_address = NULL;
     }   // end if
 
     free(self);
