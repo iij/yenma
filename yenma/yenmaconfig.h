@@ -52,6 +52,9 @@ typedef struct YenmaConfig {
 // Authentication-Results
     char *authresult_servid;
     bool authresult_use_spf_hardfail;
+    // [AUTH_USER] SMTP-authenticated senders
+    bool authresult_smtpauth_bypass;
+    bool authresult_smtpauth_privacy;
 // SPF verification
     bool spf_verify;
     bool spf_lookup_spf_rr;

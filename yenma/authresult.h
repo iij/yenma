@@ -70,6 +70,9 @@ extern bool AuthResult_appendComment(AuthResult *self, const char *comment);
 extern bool AuthResult_appendComments(AuthResult *self, ...);
 extern bool AuthResult_appendPropSpecWithToken(AuthResult *self, const char *ptype,
                                                const char *property, const char *value);
+// [AUTH_USER] value written as token or quoted-string
+extern bool AuthResult_appendPropSpecWithValue(AuthResult *self, const char *ptype,
+                                               const char *property, const char *value);
 extern bool AuthResult_appendPropSpecWithAddrSpec(AuthResult *self, const char *ptype,
                                                   const char *property, const InetMailbox *mailbox);
 extern bool AuthResult_compareAuthservId(const char *field, const char *hostname);

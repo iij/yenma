@@ -92,6 +92,12 @@
     If you use sendmail 8.13 or earlier as MTA, set
     "milter.sendmail813" to "ture" in YENMA's configuration file.
 
+    If "AuthResult.SmtpAuthBypass" is enabled, sendmail must pass the
+    {auth_authen} macro to the milter at MAIL FROM. It is included in
+    the default confMILTER_MACROS_ENVFROM; if you redefine it, keep
+    {auth_authen} in the list, otherwise the bypass silently does not
+    happen.
+
   - postfix (2.4 or later)
 
     Set "milter.postfix" to "true" in YENMA's configuration file.
@@ -103,6 +109,12 @@
 
     For more information on milter support of postfix, please refer to
     README_FILES/MILTER_README in the postfix package.
+
+    If "AuthResult.SmtpAuthBypass" is enabled, postfix must pass the
+    {auth_authen} macro to the milter at MAIL FROM. It is included in
+    the default milter_mail_macros; if you redefine it, keep
+    {auth_authen} in the list, otherwise the bypass silently does not
+    happen.
 
 * Building dependent libraries
 

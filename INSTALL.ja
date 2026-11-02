@@ -90,6 +90,13 @@
     また、MTA として使用する sendmail のバージョンが 8.13 以前の場合、
     YENMA の設定項目 "Milter.Sendmail813Compatible" を "true" に設定してください。
 
+    YENMA の設定項目 "AuthResult.SmtpAuthBypass" を有効にする場合は、
+    sendmail が MAIL FROM の時点で {auth_authen} マクロを milter に渡す
+    必要があります。このマクロは confMILTER_MACROS_ENVFROM のデフォルト値に
+    含まれています。confMILTER_MACROS_ENVFROM を再定義する場合は
+    {auth_authen} を残してください。残さない場合、検証のスキップは
+    おこなわれません (警告も出力されません)。
+
   - postfix (2.4 以降) の場合
     YENMA の設定項目 "Milter.LazyQidFetch" を "true" に設定してください。
     postfix の設定ファイル main.cf の smtpd_milters で YENMA の milter
@@ -101,6 +108,13 @@
 
     postfix の milter サポートの詳細については postfix パッケージに含ま
     れている README_FILES/MILTER_README を参照してください。
+
+    YENMA の設定項目 "AuthResult.SmtpAuthBypass" を有効にする場合は、
+    postfix が MAIL FROM の時点で {auth_authen} マクロを milter に渡す
+    必要があります。このマクロは milter_mail_macros のデフォルト値に
+    含まれています。milter_mail_macros を再定義する場合は {auth_authen}
+    を残してください。残さない場合、検証のスキップはおこなわれません
+    (警告も出力されません)。
 
 * 依存するライブラリのビルド
 

@@ -110,6 +110,16 @@ static const ConfigEntry yenma_config_table[] = {
      offsetof(YenmaConfig, authresult_use_spf_hardfail),
      "use spf \"hardfail\" result instead of \"fail\" to make compatible with RFC5451 (obsoleted)"},
 
+    // [AUTH_USER] skip verification for SMTP-authenticated senders
+    {"AuthResult.SmtpAuthBypass", CONFIG_TYPE_BOOLEAN, "false",
+     offsetof(YenmaConfig, authresult_smtpauth_bypass),
+     "skip SPF/Sender ID/DKIM/DMARC verification for SMTP-authenticated senders"},
+
+    // [AUTH_USER] omit the user name (smtp.auth) from Authentication-Results
+    {"AuthResult.SmtpAuthPrivacy", CONFIG_TYPE_BOOLEAN, "false",
+     offsetof(YenmaConfig, authresult_smtpauth_privacy),
+     "omit the SMTP AUTH user name (smtp.auth) from the Authentication-Results header"},
+
 // SPF verification
     {"SPF.Verify", CONFIG_TYPE_BOOLEAN, "true",
      offsetof(YenmaConfig, spf_verify), NULL},
