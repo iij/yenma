@@ -178,6 +178,48 @@ AuthResult_appendPropSpecWithToken(AuthResult *self, const char *ptype, const ch
     return bool_cast(0 == FoldString_appendFormatBlock(self, true, " %s.%s=%s", ptype, property, value));
 }   // end function: AuthResult_appendPropSpecWithToken
 
+// [AUTH_USER] propspec whose value is not known to be a token
+/*
+ * [RFC8601] 2.2.
+ * pvalue = [CFWS] ( value / [ [ local-part ] "@" ] domain-name ) [CFWS]
+ * value is defined in [MIME] (token / quoted-string)
+ */
+bool
+AuthResult_appendPropSpecWithValue(AuthResult *self, const char *ptype, const char *property,
+                                   const char *value)
+{
+    // check if "value" needs to be quoted
+    bool quoted_string = ('\0' == *value);
+    for (const char *p = value; '\0' != *p; ++p) {
+        if (!IS_MIMETOKEN(*p)) {
+            quoted_string = true;
+            break;
+        }   // end if
+    }   // end for
+
+    // propspec
+    (void) FoldString_appendFormatBlock(self, true, " %s.%s=", ptype, property);
+    if (quoted_string) {
+        (void) FoldString_appendChar(self, false, '\"');
+        for (const char *p = value; '\0' != *p; ++p) {
+            unsigned char c = (unsigned char) *p;
+            if ((c < 0x20 && '\t' != c) || 0x7f <= c) {
+                // neither VCHAR nor WSP, cannot be represented in a quoted-string
+                continue;
+            }   // end if
+            if (!IS_QTEXT(c) && ' ' != c && '\t' != c) {
+                // quoted-pair ('"' and '\\'), WSP is allowed as is
+                (void) FoldString_appendChar(self, false, '\\');
+            }   // end if
+            (void) FoldString_appendChar(self, false, c);
+        }   // end for
+        (void) FoldString_appendChar(self, false, '\"');
+    } else {
+        (void) FoldString_appendBlock(self, true, value);
+    }   // end if
+    return bool_cast(0 == FoldString_status(self));
+}   // end function: AuthResult_appendPropSpecWithValue
+
 bool
 AuthResult_appendPropSpecWithAddrSpec(AuthResult *self, const char *ptype, const char *property,
                                       const InetMailbox *mailbox)

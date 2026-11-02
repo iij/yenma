@@ -896,6 +896,24 @@ yenmamfi_envfrom(SMFICTX *ctx, char **argv)
         yenma_set_qid(ctx, session);
     }   // end if
 
+    // [AUTH_USER] Check if sender is an authenticated SMTP user
+    session->authenticated = false;
+    if (session->ctx->cfg->authresult_smtpauth_bypass) {
+        const char *auth_user = smfi_getsymval(ctx, "{auth_authen}");
+
+        if (NULL != auth_user && '\0' != *auth_user) {
+            session->auth_user = strdup(auth_user);
+            if (NULL == session->auth_user) {
+                LogError("auth_user duplication failed: errno=%s", strerror(errno));
+                return yenma_tempfail(session);
+            }   // end if
+            session->authenticated = true;
+            LogDebug("[AUTH_USER] authenticated user: %s, skipping verification",
+                     session->auth_user);
+            return SMFIS_CONTINUE;
+        }   // end if
+    }   // end if
+
     // [SPF] Storing the envelope from
     session->raw_envfrom = strdup(argv[0]);
     if (NULL == session->raw_envfrom) {
@@ -972,6 +990,11 @@ yenmamfi_header(SMFICTX *ctx, char *headerf, char *headerv)
         }   // end if
     }   // end if
 
+    // [AUTH_USER] forged A-R headers are collected above; nothing else to store
+    if (session->authenticated) {
+        return SMFIS_CONTINUE;
+    }   // end if
+
     // [SIDF, DKIM] ヘッダを格納する
     if (session->ctx->cfg->dkim_verify || session->ctx->cfg->sidf_verify) {
         int pos = InetMailHeaders_append(session->headers, headerf, headerv);
@@ -995,6 +1018,11 @@ yenmamfi_eoh(SMFICTX *ctx)
     YenmaSession *session = NULL;
     RESTORE_YENMASESSION(ctx, session);
     LogDebug("%s called", __func__);
+
+    // [AUTH_USER] NOP
+    if (session->authenticated) {
+        return SMFIS_CONTINUE;
+    }   // end if
 
     // [DKIM] DKIM 検証処理の可否の判断
     if (session->ctx->cfg->dkim_verify) {
@@ -1036,6 +1064,11 @@ yenmamfi_body(SMFICTX *ctx, unsigned char *bodyp, size_t bodylen)
 #if defined(DEBUG)
     LogDebug("%s called", __func__);
 #endif
+
+    // [AUTH_USER] NOP
+    if (session->authenticated) {
+        return SMFIS_CONTINUE;
+    }   // end if
 
     if (session->ctx->cfg->dkim_verify) {
         DkimStatus body_stat = DkimVerifier_updateBody(session->verifier, bodyp, bodylen);
@@ -1081,6 +1114,35 @@ yenmamfi_eom(SMFICTX *ctx)
     if (!append_stat) {
         LogNoResource();
         return yenma_tempfail(session);
+    }   // end if
+
+    // [AUTH_USER] SMTP-authenticated sender: no SPF/SIDF/DKIM/DMARC; forged A-R headers
+    // are already deleted above, our own A-R header has only the "auth" method (RFC 8601 2.7.4)
+    if (session->authenticated) {
+        (void) AuthResult_appendMethodSpec(session->authresult, AUTHRES_METHOD_AUTH, "pass");
+        if (!session->ctx->cfg->authresult_smtpauth_privacy) {
+            (void) AuthResult_appendPropSpecWithValue(session->authresult, AUTHRES_PTYPE_SMTP,
+                                                      AUTHRES_PROPERTY_AUTH, session->auth_user);
+        } else {
+            // [AUTH_USER] make the omission explicit (comments are ignored by parsers)
+            (void) AuthResult_appendComment(session->authresult, "user name omitted");
+        }   // end if
+        if (0 != AuthResult_status(session->authresult)) {
+            LogNoResource();
+            return yenma_tempfail(session);
+        }   // end if
+
+        if (MI_SUCCESS != yenma_insert_authenticationresults_header(ctx, session)) {
+            return yenma_tempfail(session);
+        }   // end if
+        LogEvent("AUTH_USER", "%s: inserted Authentication-Results:%s", session->auth_user,
+                 AuthResult_getFieldBody(session->authresult));
+
+        // reset the session
+        YenmaSession_reset(session);
+        (void) LogHandler_setPrefix(NULL);
+
+        return SMFIS_CONTINUE;
     }   // end if
 
     // SPF evaluation

@@ -37,6 +37,8 @@ typedef struct YenmaSession {
     DnsResolver *resolver;
     bool keep_leading_header_space;
     _SOCK_ADDR *hostaddr;
+    bool authenticated;     // [AUTH_USER] user authenticated by SMTP AUTH
+    char *auth_user;        // [AUTH_USER] SMTP AUTH user name
     char *helohost;
     char ipaddr[MAX_NUMERICINFO_LEN + 1];
 // per message

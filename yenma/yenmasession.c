@@ -79,6 +79,7 @@ YenmaSession_reset(YenmaSession *self)
     assert(NULL != self);
 
     PTRINIT(self->raw_envfrom);
+    PTRINIT(self->auth_user);   // [AUTH_USER]
     PTRINIT(self->qid);
     if (NULL != self->delauthhdr) {
         IntArray_reset(self->delauthhdr);
@@ -128,6 +129,7 @@ YenmaSession_free(YenmaSession *self)
     free(self->qid);
     free(self->hostaddr);
     free(self->helohost);
+    free(self->auth_user);  // [AUTH_USER]
     IntArray_free(self->delauthhdr);
     AuthResult_free(self->authresult);
     SpfEvaluator_free(self->spfevaluator);

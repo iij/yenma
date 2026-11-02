@@ -20,6 +20,12 @@ Milter.LazyQidFetch: false
 ## Authentication-Results header
 AuthResult.ServId: sa-verifier.example.net
 AuthResult.UseSpfHardfail: false
+# skip SPF/Sender ID/DKIM/DMARC for SMTP-authenticated senders and add
+# "auth=pass smtp.auth=<user>" instead; the MTA must pass the {auth_authen}
+# macro at MAIL FROM (default in Sendmail and Postfix)
+AuthResult.SmtpAuthBypass: false
+# omit the user name: "auth=pass (user name omitted)" (the syslog always has it)
+AuthResult.SmtpAuthPrivacy: false
 
 ## SPF verification
 SPF.Verify: true

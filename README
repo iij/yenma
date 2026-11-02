@@ -67,3 +67,13 @@
     prevent insertion of faked Authentication-Results: fields, the
     fields which contains the hostname specified with
     authresult.identifier are deleted.
+
+  - Skipping verification for SMTP-authenticated senders
+
+    If "AuthResult.SmtpAuthBypass" is enabled and the MTA reports an
+    SMTP AUTH user (the {auth_authen} macro), Yenma skips SPF, Sender
+    ID, DKIM and DMARC verification and records only "auth=pass"
+    (RFC 8601) with "smtp.auth=<user>" onto the Authentication-Results:
+    field. "AuthResult.SmtpAuthPrivacy" omits the user name from the
+    field (it is always logged). Faked Authentication-Results: fields
+    are deleted as usual.
